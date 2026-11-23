@@ -1,20 +1,22 @@
-# Backend: what your friend needs to deliver
+# Backend: what is integrated and what is still missing
 
-Replace the body of the functions in these three files. Keep names, arguments and return shapes
-(each file's docstring is the contract), then delete the `STUB = True` line in each.
-
-| File | Functions |
+| File | Status |
 |---|---|
-| `app/scoring/scorer.py` | `start_case`, `apply_answer`, `get_posterior`, `choose_next_question` |
-| `app/rag/retriever.py` | `retrieve`, `search`, `document_count`, `last_indexed` |
-| `app/agent/explainer.py` | `explain` |
+| `app/scoring/diagnose.py` | friend's code, used as is |
+| `app/scoring/scorer.py` | done: wraps diagnose.py; needs `data/scoring_table.csv` (not in the repo yet) |
+| `app/rag/manifest.py` | friend's manifest, used as is |
+| `app/rag/ingest.py`, `retrieve.py` | friend's code, imports and paths adjusted |
+| `app/rag/retriever.py` | done: adapter that fits the app contract |
+| `app/agent/explainer.py`, `llm.py` | done: Ollama summary writer with citation, number and wording checks |
+
+Condition names: the app's ids (`app/conditions.py`) map to the names used in `manifest.py` and in the
+CSV's condition column through `MANIFEST_NAMES` in that file. If a name changes, edit it there only.
+`pytest` fails if it drifts from `manifest.py`.
 
 Rules the backend enforces so the UI never shows something unsafe:
-- condition ids must be those in `app/conditions.py`;
 - every summary section needs at least one citation that is a real passage id, otherwise it is dropped;
 - if retrieval or the agent fails, the patient still gets the ranking.
 
 Stop rule lives in `app/pipeline.py`: 12 questions, or top probability >= 0.80 after at least 3.
 
-Quick contract check once the modules are in: `pytest -q`, then open `/health`
-(all three should say `ready`) and click through a case in the UI.
+Check: `pytest -q`, then open `/health` (all three say `ready` once the CSV and index exist).

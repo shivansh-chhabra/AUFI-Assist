@@ -144,9 +144,11 @@ def test_rag_down_keeps_scoring_result(mp):
 
 
 def test_stubs_not_installed_gives_clear_message_and_is_retryable(mp):
+    mp.setattr(config, "SCORING_TABLE", config.BACKEND_DIR / "data" / "no_such_table.csv")
+    mp.setattr(scorer, "_table", None)
     s = Session(id="t")
-    r = drive(s, "fever")                      # the real stub scorer raises NotImplementedError
-    assert "not installed yet" in r.reply and "start_case" in r.reply and not s.started
+    r = drive(s, "fever")                      # the real scorer has no table, so it raises NotImplementedError
+    assert "not installed yet" in r.reply and "scoring table" in r.reply and not s.started
     FakeScorer().install(mp); fake_rag(mp); fake_agent(mp)
     r = drive(s, "fever")                      # same session, module now present
     assert s.started and r.question
