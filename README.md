@@ -8,10 +8,11 @@ tests is shown and can be downloaded as a PDF.
 ```
 frontend/   React + Vite UI (already done)
 backend/    FastAPI API + case loop + PDF export
-  app/scoring/scorer.py      <- FRIEND: probability table, naive Bayes, question selection (still a stub)
+  app/scoring/diagnose.py    <- friend's naive Bayes + information-gain code (unchanged)
+  app/scoring/scorer.py      <- app wrapper around diagnose.py + keyword extraction from the first message
   app/rag/retriever.py       <- app adapter over rag/retrieve.py (friend's ChromaDB retrieval)
   app/rag/ingest.py          <- friend's ingest: builds the index from data/guidelines/
-  app/rag/manifest.py        <- which guideline files/pages/conditions to index (TEMPLATE: use friend's)
+  app/rag/manifest.py        <- friend's manifest: which files/pages/conditions to index (unchanged)
   app/agent/explainer.py     <- cited summary writer (local LLM via Ollama + citation checks)
   data/guidelines/           <- put the guideline PDFs here (served to the source-preview modal)
 ```
@@ -41,7 +42,7 @@ works without RAG/agent (you get the ranking and a note that the guideline searc
 ```bash
 cd backend
 pip install -r requirements.txt
-# put the PDFs in data/guidelines/ and your friend's real manifest.py in app/rag/
+# put the PDFs in data/guidelines/ (file names as in manifest.py) and the scoring CSV at data/scoring_table.csv
 python -m app.rag.ingest --dry-run      # chunk and report, nothing stored
 python -m app.rag.ingest                # builds data/chroma_db_aufi_mini
 python -m app.rag.retrieve --check      # every condition has chunks and a sane top hit
@@ -67,6 +68,7 @@ The backend serves `frontend/dist` itself. Fonts are bundled, so nothing is fetc
 | `AUFI_MIN_QUESTIONS` | 3 | never stop before this many answers |
 | `AUFI_SHORTLIST_SIZE` | 3 | conditions passed to RAG (report says 3 to 5) |
 | `AUFI_KB_DOCS_DIR` | backend/data/guidelines | guideline files for ingestion and source preview |
+| `AUFI_SCORING_TABLE` | backend/data/scoring_table.csv | P(feature given condition) CSV for diagnose.py |
 | `AUFI_CHROMA_DIR` | backend/data/chroma_db_aufi_mini | the ChromaDB index |
 | `AUFI_RELEVANCE_FLOOR` | 0.25 | passages with cosine similarity below this are dropped |
 | `AUFI_CHUNKS_PER_SECTION` | 2 | passages per condition per content type |

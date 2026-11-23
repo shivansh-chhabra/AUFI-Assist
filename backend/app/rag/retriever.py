@@ -21,12 +21,13 @@ from typing import Optional
 
 from .. import config
 from ..conditions import CONDITIONS as APP_CONDITIONS
-from ..conditions import CONTENT_TYPES, condition_name
+from ..conditions import CONTENT_TYPES, MANIFEST_NAMES, condition_name
 
 log = logging.getLogger("aufi.rag")
 
-# App condition id -> condition id used in manifest.py, only for ids that differ.
-COND_MAP: dict[str, str] = {}
+# App condition id -> condition name used in manifest.py (defined in app/conditions.py).
+COND_MAP: dict[str, str] = MANIFEST_NAMES
+_FROM_MANIFEST = {v: k for k, v in COND_MAP.items()}
 
 # What each content type looks up. Patient text is added to clinical_features only.
 _INTENT = {
@@ -148,7 +149,7 @@ def retrieve(shortlist: list[str], query: str) -> dict:
                 passages.append(_passage(hit, cid, ct))
 
     if skipped:
-        log.warning("no index tag for condition id(s) %s; set COND_MAP in rag/retriever.py", skipped)
+        log.warning("no index tag for condition id(s) %s; fix MANIFEST_NAMES in app/conditions.py", skipped)
     return {
         "passages": passages,
         "chunk_count": len(passages) + dropped,
@@ -181,7 +182,7 @@ def search(query: str, disease: Optional[str] = None, content_type: Optional[str
     out = []
     for h in r.search(q, scope, n=8):
         m = h["meta"]
-        primary = _as_condition_id(m.get("condition")) or m.get("condition")
+        primary = _FROM_MANIFEST.get(m.get("condition")) or _as_condition_id(m.get("condition"))
         out.append({
             "text": h["text"],
             "source": m.get("source_file") or "",

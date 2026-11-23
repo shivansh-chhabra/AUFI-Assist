@@ -37,3 +37,6 @@ LLM_NUM_CTX = int(os.getenv("AUFI_LLM_NUM_CTX", "8192"))
 LLM_TIMEOUT = int(os.getenv("AUFI_LLM_TIMEOUT", "180"))
 # Characters of each passage shown to the LLM (a 220-token chunk is roughly 900-1000 characters).
 LLM_CHUNK_CHARS = int(os.getenv("AUFI_LLM_CHUNK_CHARS", "1000"))
+
+# --- scoring table (P(feature | condition) CSV read by scoring/diagnose.py) ------
+SCORING_TABLE = Path(os.getenv("AUFI_SCORING_TABLE", BACKEND_DIR / "data" / "scoring_table.csv"))
