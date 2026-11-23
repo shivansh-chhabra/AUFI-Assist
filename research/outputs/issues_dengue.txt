@@ -1,0 +1,40 @@
+ISSUES - DENGUE
+
+Mohan et al. 2020 (Chennai) - primary study, 8 ledger rows (DEN-001 to DEN-008)
+1. Case definition is loose: confirmed by NS1 antigen (290), IgM (53), IgG (80) or IgM+IgG (41) ELISA. 80 patients (17.2%) were IgG-only, which can mean past infection rather than the current illness. Their symptoms are counted in the 464. Coordinator should decide whether this cohort is acceptable as poolable.
+2. Selection: 464 positives out of 2502 clinically suspected cases (18.5%) at one teaching hospital, Jul 2011-Dec 2018. Mixed ages (<18 y 30%, 18-44 y 45%, 45-60 y 18%, >60 y 8%). Inpatient/outpatient mix not stated.
+3. Fever is reported as 439 (95%) in Table 3 but 'found among all the patients' / 100% in the text and Discussion. Fever is not a dictionary feature, so nothing was extracted, but note that the fever denominator is unclear.
+4. Table 4 (atypical manifestations) is headed n=90 but its percentages are computed on 464 (e.g. splenomegaly 23 = 5.0% of 464). n=464 used for DEN-007. Splenomegaly may be under-recorded since it was counted as an 'atypical' finding.
+5. Vomiting: Table 3 and Abstract say 186 (40%); Discussion says 32%. Nausea is 13.5% in Table 3 and 14% in the text. Counts from Table 3 used.
+6. Myalgia 284 (61.2%) and 'body pain' 229 (49.3%) are separate items for the same dictionary feature. Only myalgia was entered (one row per paper per feature). Joint pain says 31% in text vs 144 (31.0%) in Table 3; consistent.
+7. Discussion says '2038 samples of clinically suspected dengue... 464 (23%)', which conflicts with 2502 suspected / 18.5% in Abstract, Results and Table 1. Table 1 sums to 2502 and 464, so those were used.
+8. Hemoptysis 5 (1%) is the only bleeding-type finding reported. No union 'any bleeding' or other component (petechiae, epistaxis etc.) is given, so no hemorrhagic_signs rows were created. Hemoptysis is not on the dictionary's component list; coordinator to say whether it should be a component row.
+9. Reported but with no dictionary feature (not extracted): headache 364, retro-orbital pain 19, nausea 63, burning micturition 12, hepatomegaly 32, bradycardia 18, meningitis 6, acalculous cholecystitis 4, pancreatitis 2.
+10. Not reported: jaundice, lymphadenopathy, conjunctival suffusion, fever pattern or duration, eschar, weight loss, night sweats, exposure histories.
+11. source_script_ref set to not_in_script. No PMID in the PDF; DOI used.
+
+Laul et al. 2016 (West Delhi) - primary study, 10 ledger rows (DEN-009 to DEN-018)
+1. Cohort: 115 patients with fever and NS1 antigen or IgM positive dengue (192 tested, 59.8% positive), Deen Dayal Upadhyay Hospital, 1 Jun-31 Aug 2015 outbreak. Acute markers only (no IgG-only cases), so the case definition is tighter than Mohan 2020.
+2. Age: the text says confirmed cases 'more than 18 years' were included, but Table 2 gives the age range as 13-71 and lists an '18-20' group. age_group set to adult; coordinator may prefer mixed.
+3. Setting is unclear: 'indoor and outdoor Departments of Medicine' and also 'patients admitted with complaint of fever'. Case mix is skewed severe (DHF 19, DSS 2, EDS 5, 4 needed ICU), so the symptom rates may be higher than in a milder outpatient cohort.
+4. Coinfections are included, not excluded: 7 of 115 (malaria 3 by slide/antigen, typhoid 4 by Widal). The paper lists some symptoms (diarrhoea, sore throat) as possibly due to coinfection.
+5. Percentages are printed as whole numbers. Four validator warnings are rounding or truncation: rash 25/115 = 21.7% (printed 21), abdominal pain 56.5% (57), hepatosplenomegaly and sore throat 25.2% (25). Counts recorded.
+6. Hemorrhagic manifestations: Table 3 says 24 (21%), Results and Discussion say 20%. 24/115 = 20.9%. Count from Table 3 used. Individual bleeding types are named without counts.
+7. Jaundice: only 'one patient with jaundice' in the text (not in Table 3). Recorded as 1/115. Splenomegaly is only reported as hepatosplenomegaly 29 (25%) in Table 4, so it is poolable N. The text calls the same 29 'associated hepatomegaly'.
+8. Sex split in the text, '64 (57%) males and 51 (44%) females', adds to 101%. Not used.
+9. Sweating (15, 13%) is not specified as night sweats; recorded as proxy for night_sweats. Sore throat (29, 25%) is at presentation, not preceding, so poolable N.
+10. Reported but with no dictionary feature (not extracted): headache 100, backache 67, retro-orbital pain 47, weakness 79, breathlessness 22, vertigo 16, syncope 14, itching 22, neurological manifestations 3, gall bladder edema 26, pleural effusion 18.
+11. Not reported: lymphadenopathy, conjunctival suffusion, arthralgia (joint pain), cough, fever pattern or duration, weight loss.
+12. source_script_ref set to not_in_script. No PMID in the PDF; DOI used. No overlap with Mohan 2020 (Chennai, different years).
+
+Padyana et al. 2019 (Bengaluru, ICU) - primary study, 7 ledger rows (DEN-019 to DEN-025), ALL poolable N
+1. Cohort is ICU-only: 96 serology-proven dengue patients admitted to a multidisciplinary ICU (96 of 1170 ICU admissions), Jul-Dec 2015, retrospective. By WHO class 50 had warning signs, 41 severe dengue and only 5 no warning signs. Mortality 21.1%. Per the protocol this is a subset cohort, so every row is poolable N (recorded for the coordinator, not for the primary pool).
+2. Symptom rates are inflated by severity and not comparable with milder cohorts (e.g. jaundice 16.7%, any bleeding 31.3%, breathlessness 57%).
+3. Bleeding does not reconcile: 'Bleeding manifestation' 30 (31.3%) but 'Petechiae/ecchymosis' 38 (39.6%), which is more than the any-bleeding total. Both recorded as printed; DEN-021 recorded as a petechiae component (petechiae and ecchymosis are combined in one item).
+4. Serology: NS1 antigen, IgM or IgG capture ELISA (IgG-only positivity may mean past infection, as with Mohan 2020). Pregnancy (9.3%) and comorbidities (diabetes 18.5%, hypertension 14.4%) are common in the cohort. Age groups: <20 y 8.3%, 21-40 y 58.4%, 41-60 y 14.5%, >60 y 18.8%, so age_group is mixed.
+5. Sex: text says 47 males (48.9%), Table 1 says 49.0%. Not used.
+6. Reported but with no dictionary feature (not extracted): fever 91, headache 39, generalised weakness 75, loss of appetite 62, breathlessness 55, altered sensorium 26.
+7. Not reported: rash, joint pain, splenomegaly, cough, lymphadenopathy, conjunctival suffusion. 'Loose stools' was taken as a diarrhoea proxy.
+8. source_script_ref set to not_in_script. No PMID in the PDF; DOI used. Different city and period from Laul 2016 and Mohan 2020, so no overlap.
+
+Validation: validate_ledger.py run on ledger_dengue.csv (25 rows): 0 errors, 4 warnings (all rounding of printed percentages in Laul 2016 rows, explained above).
