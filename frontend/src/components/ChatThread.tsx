@@ -19,9 +19,11 @@ interface ChatThreadProps {
   liveSteps?: string[];
   onAnswer: (option: AnswerOption, question: FollowUpQuestion) => void;
   onPickExample: (text: string) => void;
+  /** Where the finished case's PDF can be downloaded. */
+  reportUrl?: string;
 }
 
-export default function ChatThread({ messages, isLoading, liveSteps, onAnswer, onPickExample }: ChatThreadProps) {
+export default function ChatThread({ messages, isLoading, liveSteps, onAnswer, onPickExample, reportUrl }: ChatThreadProps) {
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const prevIsLoading = useRef(isLoading);
   const [previewSource, setPreviewSource] = useState<Source | null>(null);
@@ -100,6 +102,7 @@ export default function ChatThread({ messages, isLoading, liveSteps, onAnswer, o
                     explanation={msg.explanation}
                     sources={msg.evidence?.sources ?? []}
                     onOpenSource={setPreviewSource}
+                    reportUrl={reportUrl}
                   />
                 )}
 
