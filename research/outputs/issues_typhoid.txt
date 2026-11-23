@@ -1,0 +1,51 @@
+ISSUES - TYPHOID
+
+Chowta & Chowta 2005 (Mangalore) - primary study, 9 ledger rows (TYP-001 to TYP-009), ALL poolable N
+1. Case definition is loose. Diagnosis was 'based on clinical features, widal test and blood culture'. Blood culture was positive in only 25% (11 of 44) and a single Widal with O titre >=1:160 in 88.6%. The paper does not say how many cases were confirmed by a defined test. A single Widal is non-specific. Rows are poolable N pending a coordinator decision; if he accepts the definition they can be changed to Y.
+2. Old and small: 44 adult inpatients, 1999-2001, one teaching hospital. Mean age 23.9 years; 21 males, 23 females. Brief communication.
+3. Splenomegaly (34.09%) appears only in the Results text, not in Table 1, and no count is given. k=15 is back-calculated (DERIVED, poolable N). Hepatomegaly 18% is also reported but is not a dictionary feature.
+4. Jaundice (1) and bleeding per rectum (1) are listed under 'complications during hospitalisation' (Table 2), not under presenting symptoms. 'Bleeding per rectum' is recorded as a hemorrhagic_signs component named rectal_bleeding, which is not on the dictionary's component list; coordinator to confirm.
+5. Co-infection or misdiagnosis is possible: malaria smear was positive in one patient and dengue antibody in another. No exclusion for either is stated.
+6. Rash (including rose spots), fever pattern and duration, lymphadenopathy, conjunctival suffusion, arthralgia and night sweats are not reported.
+7. Reported but with no dictionary feature (not extracted): fever 44 (100%), headache 8, constipation 4, breathlessness 1, burning micturition 1, hepatomegaly, bradycardia 10 (22.7%), myocarditis 2, one death from DIC.
+8. source_script_ref set to not_in_script. No DOI or PMID is printed in the PDF; the journal and page range are given instead. Please confirm against the gen_synthetic_table script.
+
+Kandikuppa et al. 2024 (Chennai) - primary study, 6 ledger rows (TYP-010 to TYP-015), poolable Y / C
+1. Case definition is strong: blood culture (BACT/ALERT, MALDI-TOF, serotyping). But 57 of 125 (45.6%) had Salmonella paratyphi A, not S. typhi. Rows are marked Y/C because enteric fever is clinically near-identical and, per the data teammate's decision, paratyphoid is counted as typhoid (coordinator to confirm). Children (55) and adults (70) are mixed, so age_group is mixed; adults alone had 64% typhi.
+2. Cohort is the 125 hospitalised patients out of 213 culture-proven cases (88 outpatients excluded), so it leans more severe than all culture-proven cases. No deaths, no intestinal hemorrhage or perforation. Retrospective, Oct 2018-Mar 2023, one referral hospital; 38.4% had antibiotics before admission and 79% came from Tamil Nadu.
+3. 'Nausea or vomiting' is one printed item; recorded as vomiting proxy (component) per the dictionary.
+4. Fever duration was given only in bands (<1 week 51, 1-3 weeks 69, >3 weeks 5), so the >14 days feature (fever_prolonged) cannot be extracted.
+5. 'Intestinal hemorrhage or perforation' is 0 as one combined item. Not entered as a bleeding component because it is combined with perforation.
+6. Rose spots (2) recorded as a rash proxy; the paper does not describe any other rash.
+7. Table 4 'moderate hepatitis 7 (7.69)' uses 91 patients with transaminases as the denominator, not 125. Not extracted (no dictionary feature, and jaundice is not reported).
+8. Reported but with no dictionary feature (not extracted): headache 29, constipation 3, fatigue or weakness 37, bradycardia 11 (8.8%), leukopenia 18, eosinopenia 102, thrombocytopenia 25.
+9. Not reported: jaundice, weight loss, lymphadenopathy, conjunctival suffusion, arthralgia, myalgia, night sweats.
+10. source_script_ref set to not_in_script. No PMID in the PDF; DOI used. Different hospital and period from Chowta 2005 (Mangalore, 1999-2001), so no overlap.
+
+Kumar et al. 2012 (Manipal) - primary study, 6 ledger rows (TYP-016 to TYP-021)
+1. Cohort: 106 culture-positive Salmonella typhi inpatients (of 616 clinically suspected) at a tertiary teaching hospital in Karnataka, 2005-2008, retrospective. Widal-only cases were excluded, so the case definition is good and S. typhi only. Mean age 28.8 years; 55.7% aged 15-30; 4 children (3.8%), so age_group is mixed. 78.3% male. Referral hospital catering to cases 'unsuccessfully treated elsewhere' (stated in the Introduction), so cases may be more severe than average.
+2. Body ache: the Abstract says 'generalized body ache in 53 (32.5%)', but 53/106 = 50.0%. Body ache is not mentioned in the Results text or any table, so the number cannot be checked (53/163 would give 32.5%). Recorded as printed in TYP-020, poolable N (validator warning is this row).
+3. Splenomegaly 47 (44.3%) is stated in the Results text. Hepatosplenomegaly (23, 21.7%) is reported separately and was not used for splenomegaly.
+4. Gastrointestinal bleed (1) is a listed complication with no percentage; recorded as hemorrhagic_signs component 'gi_bleeding', which is not on the dictionary's component list, so coordinator should confirm. One patient each also had GI perforation, myocarditis and encephalitis (no dictionary features).
+5. Raised liver enzymes in 49.1% is not jaundice (dictionary rejects abnormal LFT without clinical jaundice), so no jaundice row. Jaundice, rash, cough, weight loss, lymphadenopathy are not reported.
+6. Reported but with no dictionary feature (not extracted): fever 106 (100%), headache 63, constipation 7.5%, hepatomegaly 42, abdominal tenderness 23, Widal positive 73 (68.9%).
+7. Same medical college group as Chowta 2005 (Mangalore campus) but a different hospital and years (2005-2008 vs 1999-2001), so no overlap.
+8. source_script_ref set to not_in_script. No PMID in the PDF; DOI used.
+
+Gopal 2020 (Firozabad, Uttar Pradesh) - primary study, 4 ledger rows (TYP-022 to TYP-025), ALL poolable N
+1. Case definition is unclear. 107 'cases of typhoid fever' were studied, but Table III shows blood culture positive in only 92 (85 Widal-positive, 7 Widal-negative) and negative in 15 (13 Widal-positive, 2 Widal-negative). So 15 patients (14%) were not culture-confirmed and 2 had neither a positive culture nor a positive Widal. The paper never states how a 'case' was defined or how patients were selected. Rows are poolable N pending a coordinator decision.
+2. Study period, hospital name and setting (inpatient or outpatient) are not stated. Ages are only 20-60 years in Table I (65 males, 42 females, which sums to 107), so age_group is adult.
+3. Fever is reported in only 102 of 107 patients (95%), so five 'typhoid' patients had no fever; this is not a dictionary feature but supports concern about the case definition.
+4. Only counts are given (no percentages), so reported_pct is NA. The 'P value 0.01' for fever has no meaning and was ignored. The journal's quality was not assessed.
+5. Reported but with no dictionary feature (not extracted): fever 102, headache 62, constipation 34, anorexia 5. Not reported: splenomegaly, rash or rose spots, jaundice, bleeding, weight loss, lymphadenopathy. The Discussion mentions myalgia and chills in general terms without counts.
+6. source_script_ref set to not_in_script. No article DOI or PMID is printed in the PDF (only the journal's DOI prefix).
+
+Pandit et al. 2012 (Manipal) - primary study, 6 ledger rows (TYP-026 to TYP-031)
+1. This is a PARATYPHOID series (Salmonella paratyphi), not S. typhi. Decision from the data teammate: paratyphoid is counted as typhoid (enteric fever) in the 'Typhoid fever' cell, so splenomegaly, rash, vomiting, abdominal pain and GI bleeding are poolable Y/C. Coordinator to confirm. Diarrhoea stays poolable N because its count is back-calculated. 110 culture-positive cases of 141 reviewed, Kasturba Hospital, Manipal, Jan 2005-Dec 2010, retrospective; Widal-only cases were excluded. The case definition is good.
+2. Possible overlap to rule out: same hospital, same group of authors and overlapping years as Kumar 2012 (S. typhi, 2005-2008, TYP-016 to TYP-021). The organisms differ (S. typhi vs S. paratyphi), so the patients cannot be the same and the cohorts were not double-counted.
+3. Diarrhoea is printed only as '23.6%' in the Results with no count; k=26 is back-calculated (DERIVED, poolable N). Vomiting 35 (31.8%) and abdominal pain 15 (13.6%) are given as counts in the text.
+4. Table 2 prints the aminoglycoside row as 76 (90.4%), but 76/110 = 69%; the antibiotic data are not used. The text also says '141 cases of paratyphoid fever, out of which 110 positive on blood culture', so the 110 are the culture-positive subset. 'Enteric hepatitis' 64 (58.1%) is raised liver enzymes, not jaundice, so no jaundice row.
+5. Rash is 'rash' (any); rose spots are not mentioned. Cough, jaundice, weight loss, fever pattern and duration, lymphadenopathy are not reported. Hepatomegaly (34) and hepatosplenomegaly (16) have no matching dictionary feature (or are combined).
+6. source_script_ref set to not_in_script. No PMID in the PDF; DOI used.
+
+Validation: validate_ledger.py run on ledger_typhoid.csv (31 rows, final): 0 errors, 1 warning (TYP-020, paper's own count and percentage disagree; explained above).

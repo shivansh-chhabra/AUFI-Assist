@@ -1,0 +1,23 @@
+feature,meaning_in_the_model,exact_wording_accepted,proxy_accepted_flag_as_proxy,never_accept,composite,notes
+fever_cyclical,classic periodic/cyclical fever pattern,"periodic, cyclical or intermittent fever with fever-free intervals",,"'fever present', 'high-grade fever'",N,rarely reported as a prevalence; leave blank if absent
+fever_continuous,sustained stepladder-type continuous fever,"continuous fever, sustained fever",,"'high-grade fever' (a temperature level is not a pattern), 'fever' alone",N,rarely reported; leave blank if absent
+fever_prolonged,fever persisting >2 weeks,fever for >14 days (or >2 weeks) at presentation,,mean fever duration without a >14 day count,N,check inclusion criteria: cohorts that required fever >5 days make this conditional; say so in notes
+rash_maculopapular,maculopapular skin rash,maculopapular rash,'skin rash' / 'rash' (any); 'rose spots' for typhoid only,petechiae or purpura (that is hemorrhagic_signs),N,
+arthralgia_poly,"polyarthralgia (multiple joints, non-migratory)",polyarthralgia,'arthralgia' / joint pain (any),arthritis with objective swelling,N,
+arthritis_migratory,migratory arthritis,migratory arthritis or migratory polyarthritis,'arthritis' / 'polyarthritis' in acute rheumatic fever cohorts,arthralgia without arthritis,N,
+sore_throat_preceding,sore throat BEFORE the febrile illness,history of sore throat or pharyngitis preceding the illness,,sore throat at presentation (timing mismatch; record with poolable=N),N,
+hemorrhagic_signs,any bleeding manifestation,'bleeding manifestations' (any) or 'hemorrhagic manifestations',,raised bleeding tests without clinical bleeding,Y,"single signs (petechiae, epistaxis, melena, haematuria, gum bleeding) are COMPONENT rows: mapping=component, component=<name>, poolable=C"
+eschar,eschar at the bite site,eschar,,'skin lesion' without eschar,N,
+lymphadenopathy_reg,regional (localized) lymphadenopathy,regional or localized lymphadenopathy,'lymphadenopathy' (any),"'generalized lymphadenopathy' only if the paper says generalized (record, poolable=N)",N,
+conjunctival_suffusion,conjunctival suffusion,"conjunctival suffusion, injection, congestion or redness",'conjunctivitis',,N,
+myalgia_severe,severe or prominent myalgia,severe or prominent myalgia,'myalgia' / body ache (any),,N,
+jaundice,clinical jaundice,jaundice or icterus,,"raised bilirubin, 'hepatic dysfunction' or abnormal LFT without clinical jaundice",N,
+gi_symptoms,"diarrhoea, vomiting or abdominal pain (the model asks one combined question)",'gastrointestinal symptoms' reported as ANY of these (a union),,a single component reported as if it were the union,Y,"components (vomiting, abdominal_pain, diarrhoea; nausea+vomiting counts as a vomiting proxy) are COMPONENT rows with poolable=C"
+splenomegaly,palpable splenomegaly,splenomegaly,,"hepatosplenomegaly or organomegaly as one number (record, poolable=N)",N,
+cough,cough,cough,'dry cough' or 'productive cough' alone (lower bound; flag proxy),'respiratory symptoms',N,
+weight_loss,significant weight loss,weight loss,,cachexia or malnutrition scores,N,
+night_sweats,night sweats,night sweats,'sweating' / 'profuse sweating',,N,
+travel_endemic_hx,travel or residence in an endemic zone,"travel to or residence in an endemic area, when the cohort was not selected by residence",,residence of the study hospital's catchment,N,usually not a prevalence; leave blank unless explicitly reported
+water_exposure_hx,"flood-water, sewage or animal-urine exposure history","history of contact with flood water, sewage, stagnant water or animal urine",occupational or farming water exposure,,N,
+localizing_signs,source-specific localizing signs,,,,N,do not extract; coordinator will define
+self_limited,illness tends to be short or self-limited,,,,N,not a prevalence; do not extract

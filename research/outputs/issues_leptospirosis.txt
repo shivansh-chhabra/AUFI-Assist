@@ -1,0 +1,49 @@
+ISSUES - LEPTOSPIROSIS
+
+Sethi et al. 2010 (PGIMER Chandigarh) - primary study, 20 ledger rows (LEP-001 to LEP-020)
+1. Cohort: 86 serology-positive cases (PanBio IgM ELISA; MAT in a few) reviewed retrospectively, Jan 2004-Dec 2008. They come from 232 positives among 1391 PUO samples; the paper does not say why only 86 charts were reviewed (selection possible). 76/86 also met modified Faine's criteria. 7 had mixed infection (malaria 5, dengue 1, hepatitis A 1), included in n=86.
+2. Referral tertiary hospital, so severe disease is common (renal failure 60.5%). Jaundice 63/86 (73%) is therefore high for an all-comers leptospirosis cohort. Rows set to poolable Y because all confirmed cases were included; coordinator to decide whether the skew matters.
+3. Fever: printed as 'Intermittent' (82/86) and 'Continuous' (4/86). Fever-free intervals not described, so the cyclical mapping rests on the dictionary accepting 'intermittent'. Coordinator to confirm.
+4. hemorrhagic_signs 19/86 comes from the Results text only ('obvious external bleeding, petechiae and ecchymoses ... 19 cases'), not Table 6. The Table 4 bleeding items (petechiae 9, epistaxis 1, haematuria 4, haematemesis 4, haemoptysis 1) also sum to 19, but overlap between patients is not stated. Laboratory DIC (10) is not counted. Component names haematemesis and haemoptysis are not on the dictionary's list; coordinator to confirm.
+5. Proxy rows: myalgia ('myalgia with muscle tenderness', not stated severe), lymphadenopathy (any), arthralgia (any), water_exposure_hx ('entered water-logged area barefoot', narrower than the dictionary wording, so a lower bound; 'works in fields' 38/86 not used).
+6. Sex counts in the paper add to 88 (49+39) against n=86. Not a dictionary feature, not extracted, but it shows the paper has small internal inconsistencies.
+7. Not extracted (no dictionary feature): chills, headache, oliguria, renal failure, hypotension, DIC, ARDS, outcomes. travel_endemic_hx not reported. No eschar, weight loss, night sweats, sore throat or migratory arthritis data.
+
+Das et al. 2025 (AIIMS Rishikesh) - primary study, 4 ledger rows (LEP-021 to LEP-024), ALL poolable N
+1. Cohort: 62 adult inpatients (of 68 screened) with PRESUMPTIVE leptospirosis by modified Faine score; IgM positivity was recorded but the count of lab-confirmed cases is not given. Not all cases are confirmed, so rows are poolable N pending coordinator decision.
+2. Severe-skewed: 59.7% needed HDU/ICU and mortality was 21%, retrospective Jan 2018-Dec 2024.
+3. Faine score awards points for conjunctival suffusion, myalgia and jaundice, so enrolment is partly defined by these features (circular). This is another reason for N.
+4. Only abdominal pain is reported from the GI group (27/62); vomiting and diarrhoea are not reported, so no complete gi_symptoms component set.
+5. Proxy: myalgia printed as 'Myalgia' (any).
+6. travel_endemic_hx / water_exposure_hx not extracted (exposure history not given as a count).
+
+Mansoor et al. 2015 (AJIMS&RC Mangalore) - primary study, 6 ledger rows (LEP-025 to LEP-030)
+1. Cohort: all 108 IgM-ELISA-positive inpatients, Jan 2009-Dec 2014, record-based. The authors say many manifestations may have been missed in case sheets, so counts may be underestimates. They also note possible false-positive IgM (dengue).
+2. Methods mention 'these dengue cases' in the Results (average stay 14.65 days): a copy-paste slip from another paper; the data are for leptospirosis.
+3. Skin rash 44/108 (40.7%) is much higher than Sethi 2010 (3.5%); type of rash is not stated, so mapped as proxy.
+4. hemorrhagic_signs 6/108 is from the text only ('evidence of hemorrhages'), proxy. Text also says males 72.92% in Discussion vs 75.92% in Results, and 3.07% for 4 myocarditis cases (4/108 = 3.7%). Breathlessness is 17 in Table 3 but 19 (15.74%) in the text. Not extracted.
+5. Not extracted: headache 69, orbital pain 67, oliguria 29, breathlessness (inconsistent), fever 108 (type not stated). No conjunctival suffusion count (only named in the discussion), splenomegaly, cough or arthralgia counts.
+6. No DOI printed in the PDF.
+
+George et al. 2020 (Father Muller, Mangalore) - primary study, 6 ledger rows (LEP-031 to LEP-036)
+1. Cohort: 467 adult (>18 y) inpatients, IgM ELISA positive, Jan 2013-Jun 2018. 96 were in ICU and 72 died (15.4%), so skewed to hospital-severity cases.
+2. Mangalore, but a different hospital and period from Mansoor 2015; no patient-level overlap is stated. Coordinator may want to check regional overlap.
+3. Jaundice is printed as 'Yellowish discoloration of eyes' (patient-reported) = proxy; 'Body ache' = proxy for myalgia. Fever 416/467 (89.1%) not extracted (type not stated).
+4. Counts checked: all printed percentages match n=467.
+5. Not extracted: headache 89, decreased urine output 61, meningism 25, breathlessness 28, altered sensorium 17, etc. (no dictionary feature).
+6. Case definition is 'probable case with positive IgM'; the abstract also compares with healthy controls, which were not used.
+
+Mohamed et al. 2025 (Jubilee Mission, Thrissur) - primary study, 7 ledger rows (LEP-037 to LEP-043)
+1. Cohort: 50 confirmed (IgM ELISA or PCR) of 200 clinically suspected patients, retrospective Jan-Sep 2023. Age range not stated (mean 47.9 y), so age_group set to not_stated. The 150 negatives were not used.
+2. Hepatosplenomegaly 18/50 recorded as splenomegaly poolable N per the dictionary rule.
+3. Myalgia (any), rash (type not stated) = proxy. Loose stools used for diarrhoea. Abdominal pain is not reported; fever 47/50 not extracted (type not stated); calf tenderness 2/50, hematuria 6/50 not entered.
+4. 42% ICU, 36% AKI: moderately skewed to severe disease.
+
+Patil et al. 2012 (KIMS Karad) - primary study, 6 ledger rows (LEP-044 to LEP-049)
+1. Cohort: only 23 IgM-positive adults (Jul-Dec 2010); 16/23 ICU, 7 with ARDS, 9 on dialysis. Dengue/malaria co-infection excluded, and patients whose hepatorenal failure or ARDS had another cause were excluded. Tiny n and skewed to severe disease; recorded as Y but pooling weight will be small.
+2. Table 1 prints vomiting 8 as 38.78%, but the text says 34.78%; 8/23 = 34.78%, so the typo is in the table. Table 1 'Fever >39 C 7 (71.91)' is also a typo (7/23 = 30.4%); not used.
+3. Faine's score (>25) was used for all patients, so the case definition is partly clinical.
+4. Hemoptysis 5/23 entered as a hemorrhagic_signs component (no composite count printed). Not extracted: headache 12, oliguria 9, hypotension 5, meningism 4.
+
+Validation: validate_ledger.py run on ledger_leptospirosis.csv (49 rows): 0 errors, 0 warnings.
+Poolable counts: Y 26, C 18, N 5.
