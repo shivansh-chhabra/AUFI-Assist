@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IconSend } from './Icons';
 
 interface ComposerProps {
@@ -10,6 +10,11 @@ interface ComposerProps {
 
 export default function Composer({ onSend, disabled, awaitingAnswer }: ComposerProps) {
   const [value, setValue] = useState('');
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!disabled) inputRef.current?.focus();
+  }, [disabled]);
 
   const handleSend = () => {
     if (disabled || !value.trim()) return;
@@ -26,6 +31,7 @@ export default function Composer({ onSend, disabled, awaitingAnswer }: ComposerP
             placeholder={awaitingAnswer ? 'Or answer in your own words…' : 'Describe the fever and any other symptoms…'}
             aria-label="Message"
             rows={1}
+            ref={inputRef}
             value={value}
             disabled={disabled}
             onChange={(e) => setValue(e.target.value)}

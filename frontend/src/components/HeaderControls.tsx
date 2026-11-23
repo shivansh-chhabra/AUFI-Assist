@@ -2,7 +2,7 @@ import ThemeToggle from './ThemeToggle';
 import { USE_MOCK_DATA } from '../config';
 
 interface HeaderControlsProps {
-  userInitials: string;
+  userInitials?: string;
   theme: 'dark' | 'light';
   toggleTheme: () => void;
 }
@@ -17,7 +17,7 @@ export default function HeaderControls({ userInitials, theme, toggleTheme }: Hea
         </span>
       )}
       <ThemeToggle theme={theme} onToggle={toggleTheme} />
-      <div className="avatar" aria-label="Signed in as clinician">{userInitials}</div>
+      {userInitials && <div className="avatar">{userInitials}</div>}
     </div>
   );
 }

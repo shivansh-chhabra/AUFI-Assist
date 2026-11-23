@@ -7,6 +7,7 @@ import SearchOverlay from './components/SearchOverlay';
 import { useTheme } from './hooks/useTheme';
 import { fetchConversationHistory, fetchConversations, fetchKnowledgeBaseStatus, sendMessageStream } from './api/client';
 import { WORKSPACE } from './brand';
+import { API_URL, USE_MOCK_DATA } from './config';
 import type { AnswerOption, AnswerPayload, ChatMessage, Conversation, FollowUpQuestion, KnowledgeBaseStatus } from './types';
 
 let messageIdCounter = 0;
@@ -73,6 +74,12 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
       if (active) {
         setActiveConversationId(active.id);
         fetchConversationHistory(active.id).then(setMessages);
+      } else {
+        // No saved cases (no database): start one locally so every message
+        // carries a conversation_id the backend can key its scoring state on.
+        const first: Conversation = { id: `local-${Date.now()}`, title: 'New case', active: true };
+        setConversations([first]);
+        setActiveConversationId(first.id);
       }
     });
     fetchKnowledgeBaseStatus().then(setKbStatus);
@@ -188,13 +195,18 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
       />
 
       <div className="main">
-        <HeaderControls userInitials="Dr" theme={theme} toggleTheme={toggleTheme} />
+        <HeaderControls theme={theme} toggleTheme={toggleTheme} />
         <ChatThread
           messages={messages}
           isLoading={isLoading}
           liveSteps={liveSteps}
           onAnswer={handleQuickAnswer}
           onPickExample={(text) => handleSend(text)}
+          reportUrl={
+            USE_MOCK_DATA || !activeConversationId
+              ? undefined
+              : `${API_URL}/report/${encodeURIComponent(activeConversationId)}/pdf`
+          }
         />
         <Composer
           onSend={(text) => handleSend(text)}

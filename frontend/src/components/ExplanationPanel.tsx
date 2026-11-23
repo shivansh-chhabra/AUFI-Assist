@@ -6,10 +6,12 @@ interface ExplanationPanelProps {
   explanation: DiseaseExplanation[];
   sources: Source[];
   onOpenSource: (source: Source) => void;
+  /** Backend PDF endpoint for this case; when absent the button prints the page instead. */
+  reportUrl?: string;
 }
 
 /** The grounded explanation for each shortlisted disease, one tab per disease. */
-export default function ExplanationPanel({ explanation, sources, onOpenSource }: ExplanationPanelProps) {
+export default function ExplanationPanel({ explanation, sources, onOpenSource, reportUrl }: ExplanationPanelProps) {
   const [active, setActive] = useState(0);
   const current = explanation[Math.min(active, explanation.length - 1)];
   if (!current) return null;
@@ -21,6 +23,15 @@ export default function ExplanationPanel({ explanation, sources, onOpenSource }:
       <div className="expl-head">
         <div className="expl-title">From the guidelines</div>
         <div className="expl-tag">Every statement is cited</div>
+        {reportUrl ? (
+          <a className="expl-print" href={reportUrl} download>
+            Download PDF
+          </a>
+        ) : (
+          <button className="expl-print" onClick={() => window.print()} type="button">
+            Print / save as PDF
+          </button>
+        )}
       </div>
 
       {explanation.length > 1 && (
@@ -68,7 +79,7 @@ export default function ExplanationPanel({ explanation, sources, onOpenSource }:
       </div>
 
       <div className="expl-foot">
-        Decision support for clinicians. This is a shortlist to confirm with tests, not a diagnosis.
+        Decision support only. This is a shortlist to confirm with a clinician and tests, not a diagnosis.
       </div>
     </div>
   );

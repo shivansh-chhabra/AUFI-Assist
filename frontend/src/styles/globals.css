@@ -709,3 +709,21 @@ textarea:focus-visible, .conv-item:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .cand-bar > span, .case-tick { transition: none; }
 }
+
+/* ---------------- PRINT / SAVE AS PDF ---------------- */
+.expl-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.expl-print {
+  margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+  padding: 6px 12px; border: 1px solid var(--border-strong); border-radius: 8px;
+  background: var(--surface-2); transition: border-color 0.15s, color 0.15s;
+}
+.expl-print:hover { border-color: var(--accent-line); color: var(--accent); }
+@media print {
+  .sidebar, .header-controls, .composer-wrap, .case-strip, .expl-print,
+  .question-card, .why-toggle, .cand-more { display: none !important; }
+  html, body, #root { height: auto; }
+  .app { display: block; height: auto; overflow: visible; }
+  .main { display: block; overflow: visible; }
+  .thread { overflow: visible; max-width: none; padding: 0; }
+  body, .main { background: #fff; color: #000; }
+}
