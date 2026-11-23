@@ -5,3 +5,7 @@ reportlab>=4.0      # server-side PDF export
 pypdf>=4.0          # guideline text for the source-preview modal
 pytest>=8.0         # tests only
 httpx>=0.27         # tests only (FastAPI TestClient)
+chromadb>=0.5                  # guideline index (rag/retrieve.py, rag/ingest.py)
+sentence-transformers>=3.0     # all-MiniLM-L6-v2 embeddings
+pymupdf>=1.24                  # PDF text extraction at ingest time
+langchain-text-splitters>=0.2  # chunking at ingest time

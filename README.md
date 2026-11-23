@@ -8,9 +8,11 @@ tests is shown and can be downloaded as a PDF.
 ```
 frontend/   React + Vite UI (already done)
 backend/    FastAPI API + case loop + PDF export
-  app/scoring/scorer.py      <- FRIEND: probability table, naive Bayes, question selection
-  app/rag/retriever.py       <- FRIEND: ChromaDB retrieval
-  app/agent/explainer.py     <- FRIEND: agent loop that writes the cited summary
+  app/scoring/scorer.py      <- FRIEND: probability table, naive Bayes, question selection (still a stub)
+  app/rag/retriever.py       <- app adapter over rag/retrieve.py (friend's ChromaDB retrieval)
+  app/rag/ingest.py          <- friend's ingest: builds the index from data/guidelines/
+  app/rag/manifest.py        <- which guideline files/pages/conditions to index (TEMPLATE: use friend's)
+  app/agent/explainer.py     <- cited summary writer (local LLM via Ollama + citation checks)
   data/guidelines/           <- put the guideline PDFs here (served to the source-preview modal)
 ```
 
@@ -34,6 +36,19 @@ Open http://localhost:8000/health to see which of your friend's modules are stil
 Until a module is delivered, the UI shows a plain message naming the missing file; scoring still
 works without RAG/agent (you get the ranking and a note that the guideline search isn't connected).
 
+## Build the guideline index and start the local LLM
+
+```bash
+cd backend
+pip install -r requirements.txt
+# put the PDFs in data/guidelines/ and your friend's real manifest.py in app/rag/
+python -m app.rag.ingest --dry-run      # chunk and report, nothing stored
+python -m app.rag.ingest                # builds data/chroma_db_aufi_mini
+python -m app.rag.retrieve --check      # every condition has chunks and a sane top hit
+
+ollama pull llama3.2:3b                 # summary writer; if Ollama is off, summaries are quoted guideline text
+```
+
 ## Run it (demo day, one process, no Node, no internet)
 
 ```bash
@@ -51,7 +66,11 @@ The backend serves `frontend/dist` itself. Fonts are bundled, so nothing is fetc
 | `AUFI_CONFIDENCE_THRESHOLD` | 0.80 | stop when the top condition reaches this probability |
 | `AUFI_MIN_QUESTIONS` | 3 | never stop before this many answers |
 | `AUFI_SHORTLIST_SIZE` | 3 | conditions passed to RAG (report says 3 to 5) |
-| `AUFI_KB_DOCS_DIR` | backend/data/guidelines | guideline files for source preview |
+| `AUFI_KB_DOCS_DIR` | backend/data/guidelines | guideline files for ingestion and source preview |
+| `AUFI_CHROMA_DIR` | backend/data/chroma_db_aufi_mini | the ChromaDB index |
+| `AUFI_RELEVANCE_FLOOR` | 0.25 | passages with cosine similarity below this are dropped |
+| `AUFI_CHUNKS_PER_SECTION` | 2 | passages per condition per content type |
+| `AUFI_LLM_MODEL` / `AUFI_LLM_URL` | llama3.2:3b / http://localhost:11434 | Ollama model and address |
 
 ## Data handling
 
