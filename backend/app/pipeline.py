@@ -153,6 +153,27 @@ def run_turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Itera
             yield ("final", resp)
 
 
+def undo_last(s: Session) -> ChatResponse:
+    """Take back the last answer: rebuild the scoring state from the earlier answers and re-ask that question."""
+    with s.lock:
+        if s.finished or not s.started or not s.asked:
+            return _response(
+                s, "There is no earlier answer to change.", [],
+                candidates=_candidates(s, []) if s.posterior else None,
+                question=_question_model(s.pending) if s.pending else None, progress=_progress(s))
+        last = s.asked.pop()
+        state = scorer.start_case(s.initial_text)
+        for a in s.asked:
+            scorer.apply_answer(state, a["feature"], a["answer"])
+        s.scorer_state = state
+        s.pending = last.get("q") or {"feature": last["feature"], "text": last["text"]}
+        s.posterior = _normalise(scorer.get_posterior(state))
+        s.previous = {}
+        return _response(
+            s, "No problem. Here is that question again.", [],
+            candidates=_candidates(s, []), question=_question_model(s.pending), progress=_progress(s))
+
+
 def _remember(s: Session, r: ChatResponse) -> None:
     w = r.wire()
     s.add_message(
@@ -224,7 +245,7 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
                 return
             yield note(f"Recorded your answer: {ANSWER_LABEL[value]}.")
             scorer.apply_answer(s.scorer_state, pending["feature"], value)
-            s.asked.append({"feature": pending["feature"], "text": pending["text"], "answer": value})
+            s.asked.append({"feature": pending["feature"], "text": pending["text"], "answer": value, "q": dict(pending)})
             s.pending = None
             s.previous = dict(s.posterior)
             s.posterior = _normalise(scorer.get_posterior(s.scorer_state))
@@ -364,7 +385,7 @@ def _merge_protocol(explanation, evidence, protocol, s):
                         id=next_id, title=f"{d['title']} ({d['issuer']}, {d['year']})", location=loc,
                         body=d["issuer"] if d["issuer"] in ("ICMR", "MoHFW") else None,
                         disease=condition_name(cid), content_type="confirmatory_tests",
-                        file=f, url=f"/kb-docs/{f}" if f else None, snippet=None))
+                        file=f, url=f"/kb-docs/{f}" if f else d["url"], snippet=None))
                     made[key] = next_id
                     next_id += 1
                 cites.append(made[key])

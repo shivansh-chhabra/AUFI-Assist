@@ -1,6 +1,7 @@
 """Server-side PDF of a finished case: ranking, answers, per-disease summary, recommended tests, sources."""
 import datetime as dt
 import io
+import re
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -56,8 +57,13 @@ def build_pdf(s: Session) -> bytes:
 
     sources = {x["id"]: x for x in (s.evidence or {}).get("sources", [])}
 
+    def rich(text: str) -> str:
+        t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", c(text))
+        t = re.sub(r"(?m)^- ", "&bull; ", t)
+        return t.replace("\n\n", "<br/><br/>").replace("\n", "<br/>")
+
     def cited(text: str, cites: list[int]) -> str:
-        return c(text) + " " + "".join(f"<super>[{n}]</super>" for n in cites)
+        return rich(text) + " " + "".join(f"<super>[{n}]</super>" for n in cites)
 
     story = [
         Paragraph("AUFI Assist: case summary", h1),

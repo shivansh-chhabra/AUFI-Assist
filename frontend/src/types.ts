@@ -59,7 +59,7 @@ export interface Source {
   relevance?: number;
   /** Filename in the guideline corpus, if different from `title`. */
   file?: string;
-  /** Opens the real source document. */
+  /** Official web address of the guideline, used when the PDF is not in the local guideline folder. */
   url?: string;
   /** The retrieved chunk text, used to highlight it in the preview. */
   snippet?: string;

@@ -4,12 +4,13 @@ import remarkGfm from 'remark-gfm';
 import EvidencePanel from './EvidencePanel';
 import ExplanationPanel from './ExplanationPanel';
 import CandidatePanel from './CandidatePanel';
-import QuestionCard from './QuestionCard';
+import QuestionStage from './QuestionStage';
 import CaseProgress from './CaseProgress';
 import ReasoningPanel from './ReasoningPanel';
 import DocumentPreviewModal from './DocumentPreviewModal';
 import { EXAMPLE_PROMPTS } from '../conditions';
 import { BRAND_NAME } from '../brand';
+import { deriveCase } from '../utils/caseState';
 import type { AnswerOption, ChatMessage, FollowUpQuestion, Source } from '../types';
 
 interface ChatThreadProps {
@@ -19,36 +20,37 @@ interface ChatThreadProps {
   liveSteps?: string[];
   onAnswer: (option: AnswerOption, question: FollowUpQuestion) => void;
   onPickExample: (text: string) => void;
+  onBack: () => void;
+  direction: 'forward' | 'back';
+  canGoBack: boolean;
   /** Where the finished case's PDF can be downloaded. */
   reportUrl?: string;
 }
 
-export default function ChatThread({ messages, isLoading, liveSteps, onAnswer, onPickExample, reportUrl }: ChatThreadProps) {
-  const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const prevIsLoading = useRef(isLoading);
+export default function ChatThread({
+  messages, isLoading = false, liveSteps = [], onAnswer, onPickExample, onBack, direction, canGoBack, reportUrl,
+}: ChatThreadProps) {
   const [previewSource, setPreviewSource] = useState<Source | null>(null);
+  const topRef = useRef<HTMLDivElement>(null);
+  const { progress, finished, inCase, last } = deriveCase(messages);
 
-  // After a reply finishes, scroll so the question that started the exchange
-  // sits near the top, so a long answer doesn't push it out of view.
+  // Sources that have a local PDF open in the preview; the rest open the official guideline page.
+  const openSource = (s: Source) => {
+    if (s.file) setPreviewSource(s);
+    else if (s.url && /^https?:/i.test(s.url)) window.open(s.url, '_blank', 'noopener,noreferrer');
+    else setPreviewSource(s);
+  };
+
   useEffect(() => {
-    if (prevIsLoading.current && !isLoading) {
-      const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user');
-      if (lastUserMessage) {
-        messageRefs.current[lastUserMessage.id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-    prevIsLoading.current = isLoading;
-  }, [isLoading, messages]);
+    if (finished) topRef.current?.scrollIntoView({ block: 'start' });
+  }, [finished]);
 
-  const latestProgress = [...messages].reverse().find((m) => m.progress)?.progress;
-  const lastMessage = messages[messages.length - 1];
-  const lastAiWithCandidates = [...messages].reverse().find((m) => m.role === 'ai' && m.candidates?.length);
-
-  return (
-    <>
-      <CaseProgress progress={latestProgress} />
-      <div className="thread">
-        {messages.length === 0 && !isLoading && (
+  // ---- welcome ----
+  if (messages.length === 0 && !isLoading) {
+    return (
+      <>
+        <CaseProgress progress={undefined} />
+        <div className="thread thread--welcome">
           <div className="empty">
             <h2>Describe the fever in your own words.</h2>
             <p>
@@ -56,76 +58,122 @@ export default function ChatThread({ messages, isLoading, liveSteps, onAnswer, o
               11 conditions as possible, then explain the likely ones from ICMR and MoHFW guidelines.
             </p>
             <div className="example-list">
-              {EXAMPLE_PROMPTS.map((p) => (
-                <button key={p} className="example-btn" onClick={() => onPickExample(p)} type="button">
+              {EXAMPLE_PROMPTS.map((p, i) => (
+                <button
+                  key={p}
+                  className="example-btn"
+                  style={{ animationDelay: `${0.12 * i + 0.1}s` }}
+                  onClick={() => onPickExample(p)}
+                  type="button"
+                >
+                  <span className="example-n">{i + 1}</span>
                   {p}
                 </button>
               ))}
             </div>
           </div>
-        )}
+        </div>
+      </>
+    );
+  }
 
-        {messages.map((msg) => {
-          const isWaitingOnAnswer = msg.role === 'ai' && msg.question && msg === lastMessage && !isLoading;
-          return (
-            <div
-              className={`msg${msg.role === 'user' ? ' user' : ' ai'}`}
-              key={msg.id}
-              ref={(el) => {
-                messageRefs.current[msg.id] = el;
-              }}
-            >
-              <div className="msg-inner">
-                <div className={`msg-role${msg.role === 'ai' ? ' ai' : ''}`}>
-                  {msg.role === 'user' ? 'You' : BRAND_NAME}
+  // ---- questions: one fixed screen, content swapped in place ----
+  if (inCase || (isLoading && messages.length === 0)) {
+    const question = last?.role === 'ai' ? last.question : null;
+    return (
+      <QuestionStage
+        question={question}
+        message={last?.role === 'ai' && !question ? last.text : undefined}
+        progress={progress}
+        isLoading={isLoading}
+        liveSteps={liveSteps}
+        direction={direction}
+        canGoBack={canGoBack}
+        onAnswer={onAnswer}
+        onBack={onBack}
+      />
+    );
+  }
+
+  // ---- result: the first description, then the final answer (the Q&A is folded away) ----
+  const finalIdx = Math.max(0, messages.findIndex((m) => m.role === 'ai' && m.progress?.stopReason));
+  const firstUser = messages.find((m) => m.role === 'user');
+  const visible: ChatMessage[] = [...(firstUser ? [firstUser] : []), ...messages.slice(finalIdx)];
+  const answers: { q: string; a: string }[] = [];
+  messages.slice(0, finalIdx).forEach((m, i, arr) => {
+    const next = arr[i + 1];
+    if (m.role === 'ai' && m.question && next?.role === 'user') answers.push({ q: m.question.text, a: next.text });
+  });
+  const lastAiWithCandidates = [...messages].reverse().find((m) => m.role === 'ai' && m.candidates?.length);
+
+  return (
+    <>
+      <CaseProgress progress={progress} />
+      <div className="thread">
+        <div ref={topRef} />
+        {visible.map((msg, idx) => (
+          <div className={`msg${msg.role === 'user' ? ' user' : ' ai'}`} key={msg.id}>
+            <div className="msg-inner">
+              <div className={`msg-role${msg.role === 'ai' ? ' ai' : ''}`}>{msg.role === 'user' ? 'You' : BRAND_NAME}</div>
+
+              {msg.role === 'ai' ? (
+                <div className="msg-body markdown-body">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
                 </div>
+              ) : (
+                <div className="msg-body">{msg.text}</div>
+              )}
 
-                {msg.role === 'ai' ? (
-                  <div className="msg-body markdown-body">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
-                    {msg.question && <p className="followup-q">{msg.question.text}</p>}
-                  </div>
-                ) : (
-                  <div className="msg-body">{msg.text}</div>
-                )}
+              {idx === 1 && answers.length > 0 && (
+                <details className="why-toggle" style={{ marginTop: '0.75rem' }}>
+                  <summary className="why-summary">
+                    <span className="chev">▶</span> Your answers ({answers.length})
+                  </summary>
+                  <ul className="answers-list">
+                    {answers.map((x, i) => (
+                      <li key={i}>
+                        <span>{x.q}</span>
+                        <b>{x.a}</b>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
 
-                {isWaitingOnAnswer && msg.question && (
-                  <QuestionCard question={msg.question} onAnswer={onAnswer} disabled={isLoading} />
-                )}
+              {msg.candidates && msg.candidates.length > 0 && (
+                <CandidatePanel candidates={msg.candidates} isLatest={msg === lastAiWithCandidates} />
+              )}
 
-                {msg.candidates && msg.candidates.length > 0 && (
-                  <CandidatePanel candidates={msg.candidates} isLatest={msg === lastAiWithCandidates} />
-                )}
+              {msg.explanation && msg.explanation.length > 0 && (
+                <ExplanationPanel
+                  explanation={msg.explanation}
+                  sources={msg.evidence?.sources ?? []}
+                  onOpenSource={openSource}
+                  reportUrl={reportUrl}
+                />
+              )}
 
-                {msg.explanation && msg.explanation.length > 0 && (
-                  <ExplanationPanel
-                    explanation={msg.explanation}
-                    sources={msg.evidence?.sources ?? []}
-                    onOpenSource={setPreviewSource}
-                    reportUrl={reportUrl}
-                  />
-                )}
+              {msg.evidence && (
+                <EvidencePanel evidence={msg.evidence} explanation={msg.explanation} onOpenSource={openSource} />
+              )}
 
-                {msg.steps && msg.steps.length > 0 && (
-                  <details className="why-toggle" style={{ marginTop: '0.75rem' }}>
-                    <summary className="why-summary">
-                      <span className="chev">▶</span> What the system did ({msg.steps.length} steps)
-                    </summary>
-                    <ReasoningPanel steps={msg.steps} />
-                  </details>
-                )}
-
-                {msg.evidence && <EvidencePanel evidence={msg.evidence} onOpenSource={setPreviewSource} />}
-              </div>
+              {msg.steps && msg.steps.length > 0 && (
+                <details className="why-toggle" style={{ marginTop: '0.75rem' }}>
+                  <summary className="why-summary">
+                    <span className="chev">▶</span> What the system did ({msg.steps.length} steps)
+                  </summary>
+                  <ReasoningPanel steps={msg.steps} />
+                </details>
+              )}
             </div>
-          );
-        })}
+          </div>
+        ))}
 
         {isLoading && (
           <div className="msg ai">
             <div className="msg-inner">
               <div className="msg-role ai">{BRAND_NAME}</div>
-              <ReasoningPanel steps={liveSteps ?? []} live />
+              <ReasoningPanel steps={liveSteps} live />
             </div>
           </div>
         )}
@@ -134,6 +182,7 @@ export default function ChatThread({ messages, isLoading, liveSteps, onAnswer, o
       {previewSource && (
         <DocumentPreviewModal
           filename={previewSource.file ?? previewSource.title}
+          location={previewSource.location}
           highlight={previewSource.snippet}
           onClose={() => setPreviewSource(null)}
         />

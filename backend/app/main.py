@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config, kb_files
 from .agent import explainer
-from .pipeline import run_turn
+from .pipeline import run_turn, undo_last
 from .rag import retriever
 from .report import build_pdf
 from .schemas import ChatRequest, SearchRequest
@@ -49,6 +49,11 @@ def chat(req: ChatRequest):
         if kind == "final":
             final = payload
     return final.wire()
+
+
+@router.post("/chat/back")
+def chat_back(req: ChatRequest):
+    return undo_last(store.get(req.conversation_id)).wire()
 
 
 # ---- PDF report ---------------------------------------------------------------------------

@@ -39,8 +39,8 @@ def test_parse_day(text, day):
 def test_day_of_fever_picks_the_valid_dengue_test():
     early = px.prescribe({"dengue": 0.8}, ["dengue"], day=3)["by_condition"]["dengue"]["text"]
     late = px.prescribe({"dengue": 0.8}, ["dengue"], day=8)["by_condition"]["dengue"]["text"]
-    assert "NS1 antigen (ELISA) (day 1-5)" in early and "IgM capture ELISA (MAC-ELISA) (not valid yet" in early
-    assert "NS1" not in late.split("Recommended:")[1].split("Also useful")[0] and "after day 5" in late
+    assert "**Dengue NS1 antigen (ELISA)** (day 1-5)" in early and "**Dengue IgM capture ELISA (MAC-ELISA)** (not valid yet" in early
+    assert "NS1" not in late.split("**Recommended tests**")[1].split("**Also useful**")[0] and "after day 5" in late
 
 
 def test_close_pair_adds_the_explicit_differentiator_and_is_deterministic():
@@ -49,7 +49,8 @@ def test_close_pair_adds_the_explicit_differentiator_and_is_deterministic():
     assert a == px.prescribe(post, ["dengue", "chikungunya", "malaria"], day=4)
     assert a["close"] == ["dengue", "chikungunya"]
     t = a["by_condition"]["dengue"]["text"]
-    assert "close" in t and "tell them apart" in t and "haematocrit" in t
+    assert "Close call: Dengue or Chikungunya" in t and "tell them apart" in t and "haematocrit" in t
+    assert "- **Dengue NS1 antigen (ELISA)**" in t
     assert "tell them apart" not in a["by_condition"]["malaria"]["text"]
 
 
@@ -70,5 +71,5 @@ def test_every_condition_gets_text_with_citations_and_viral_ili_is_conditional()
     r = px.prescribe({c: 0.1 for c in CONDITIONS}, list(CONDITIONS), day=None, margin=0)["by_condition"]
     assert set(r) == set(CONDITIONS)
     assert all(v["text"] and v["citations"] for v in r.values())
-    assert "Category C" in r["viral_ili"]["text"] and "Recommended:" not in r["viral_ili"]["text"]
+    assert "Category C" in r["viral_ili"]["text"] and "**Recommended tests**" not in r["viral_ili"]["text"]
     assert "Baseline for any fever" in r[list(CONDITIONS)[0]]["text"]

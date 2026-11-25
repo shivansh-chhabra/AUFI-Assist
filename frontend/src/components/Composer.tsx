@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { IconSend } from './Icons';
 
 interface ComposerProps {
@@ -6,15 +6,12 @@ interface ComposerProps {
   disabled?: boolean;
   /** True while a follow-up question is waiting on an answer. */
   awaitingAnswer?: boolean;
+  /** Slimmer box, used under the question screen. */
+  compact?: boolean;
 }
 
-export default function Composer({ onSend, disabled, awaitingAnswer }: ComposerProps) {
+export default function Composer({ onSend, disabled, awaitingAnswer, compact }: ComposerProps) {
   const [value, setValue] = useState('');
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (!disabled) inputRef.current?.focus();
-  }, [disabled]);
 
   const handleSend = () => {
     if (disabled || !value.trim()) return;
@@ -25,13 +22,13 @@ export default function Composer({ onSend, disabled, awaitingAnswer }: ComposerP
   return (
     <div className="composer-wrap">
       <div className="composer">
-        <div className="composer-box">
+        {/* No autofocus on purpose: the grey box already shows where to type. */}
+        <div className={`composer-box${compact ? ' composer-box--compact' : ''}`}>
           <textarea
             className="composer-input"
             placeholder={awaitingAnswer ? 'Or answer in your own words…' : 'Describe the fever and any other symptoms…'}
             aria-label="Message"
-            rows={1}
-            ref={inputRef}
+            rows={compact ? 2 : 3}
             value={value}
             disabled={disabled}
             onChange={(e) => setValue(e.target.value)}
