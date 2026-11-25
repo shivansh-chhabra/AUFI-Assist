@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Optional
 
 from .. import config
+from ..conditions import condition_name
 
 _PATH = Path(__file__).with_name("test_protocols.json")
 _DAY = [
@@ -67,15 +68,13 @@ def _window(tid: str, cids, day) -> dict:
     return {}
 
 
-def _entry_text(e: dict, day) -> Optional[str]:
+def _bullet(e: dict, day) -> Optional[str]:
     st = _status(e["when"], day)
-    n = _name(e["test"])
-    w = e["when"].get("text") or ""
     if st == "late":
         return None
-    if st == "early":
-        return f"{n} (not valid yet; use {w})"
-    return f"{n} ({w})" if w and w != "any day of illness" else n
+    w = e["when"].get("text") or ""
+    extra = f" (not valid yet; use {w})" if st == "early" else (f" ({w})" if w and w != "any day of illness" else "")
+    return f"- **{_name(e['test'])}**{extra}"
 
 
 def baseline_text(day: Optional[int]) -> tuple[str, list]:
@@ -90,28 +89,30 @@ def baseline_text(day: Optional[int]) -> tuple[str, list]:
 
 def condition_text(cid: str, day: Optional[int]) -> tuple[str, list]:
     c = load()["conditions"][cid]
-    cites, parts = [], []
-    first = [(e, _entry_text(e, day)) for e in c.get("first_line", [])]
+    cites, blocks = [], []
+    first = [(e, _bullet(e, day)) for e in c.get("first_line", [])]
     first = [(e, t) for e, t in first if t]
     if first:
-        parts.append("Recommended: " + "; ".join(t for _, t in first) + ".")
+        blocks.append("**Recommended tests**\n" + "\n".join(t for _, t in first))
         for e, _ in first:
             cites += [_cite(x) for x in e["src"]]
     for e in c.get("conditional", []):
-        parts.append(f"If {e['if_']}: {_name(e['test'])}. {e['why']}")
+        blocks.append(f"**If {e['if_']}**\n- **{_name(e['test'])}**: {e['why']}")
         cites += [_cite(x) for x in e["src"]]
     also = [e for e in c.get("also", []) if _status(e["when"], day) != "late"]
     if also:
-        parts.append("Also useful: " + "; ".join(_name(e["test"]) for e in also) + ".")
+        blocks.append("**Also useful**\n" + "\n".join(f"- **{_name(e['test'])}**" for e in also))
         for e in also:
             cites += [_cite(x) for x in e["src"]]
-    for e in c.get("not_recommended", []):
-        parts.append(f"Not recommended: {_name(e['test'])}. {e['why']}")
-        cites += [_cite(x) for x in e["src"]]
+    nr = c.get("not_recommended", [])
+    if nr:
+        blocks.append("**Not recommended**\n" + "\n".join(f"- **{_name(e['test'])}**: {e['why']}" for e in nr))
+        for e in nr:
+            cites += [_cite(x) for x in e["src"]]
     for n in c.get("notes", []):
-        parts.append(n["text"])
+        blocks.append("**Note:** " + n["text"])
         cites += [_cite(x) for x in n["src"]]
-    return " ".join(parts), cites
+    return "\n\n".join(blocks), cites
 
 
 def pair_info(a: str, b: str, day: Optional[int]) -> dict:
@@ -155,7 +156,7 @@ def prescribe(posterior: dict, shortlist: list, day: Optional[int] = None, margi
         pre = []
         if i == 0:
             t, c = baseline_text(day)
-            pre.append("Baseline for any fever: " + t)
+            pre.append("**Baseline for any fever:** " + t)
             cites = c + cites
         if cid in close:
             for other in close:
@@ -163,11 +164,11 @@ def prescribe(posterior: dict, shortlist: list, day: Optional[int] = None, margi
                     continue
                 info = pair_info(cid, other, day)
                 if info["tests"]:
-                    names = "; ".join(_name(t) for t in info["tests"])
-                    sent = (f"The probabilities of {cid.replace('_', ' ')} and {other.replace('_', ' ')} are close. "
-                            f"To tell them apart send: {names}.")
+                    bullets = "\n".join(f"- **{_name(t)}**" for t in info["tests"])
+                    sent = (f"**Close call: {condition_name(cid)} or {condition_name(other)}.** "
+                            f"The probabilities are close. To tell them apart, send:\n{bullets}")
                     if info["contrast"]:
-                        sent += " " + info["contrast"]
+                        sent += "\n\n" + info["contrast"]
                     pre.append(sent)
                     cites = cites + info["src"]
         seen, uniq = set(), []
@@ -175,5 +176,5 @@ def prescribe(posterior: dict, shortlist: list, day: Optional[int] = None, margi
             if c not in seen:
                 seen.add(c)
                 uniq.append(c)
-        out[cid] = {"text": " ".join(pre + [text]).strip(), "citations": uniq}
+        out[cid] = {"text": "\n\n".join(pre + [text]).strip(), "citations": uniq}
     return {"by_condition": out, "close": close, "day": day, "version": d["meta"]["version"]}

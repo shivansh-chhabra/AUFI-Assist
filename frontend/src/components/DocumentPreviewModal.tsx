@@ -6,6 +6,8 @@ import { API_URL, USE_MOCK_DATA } from '../config';
 interface DocumentPreviewModalProps {
   /** The guideline source filename, e.g. "dengue_guidelines.pdf". */
   filename: string;
+  /** Where the cited passage is, e.g. "pp. 3-4"; used to open the PDF at that page. */
+  location?: string;
   /** The specific chunk of text that was cited, if any — gets highlighted and scrolled to. */
   highlight?: string;
   onClose: () => void;
@@ -18,10 +20,11 @@ function normalize(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
 
-export default function DocumentPreviewModal({ filename, highlight, onClose }: DocumentPreviewModalProps) {
+export default function DocumentPreviewModal({ filename, location, highlight, onClose }: DocumentPreviewModalProps) {
   const [text, setText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const highlightRef = useRef<HTMLElement>(null);
+  const page = /\bpp?\.\s*(\d+)/.exec(location ?? '')?.[1];
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +39,7 @@ export default function DocumentPreviewModal({ filename, highlight, onClose }: D
 
     fetch(`${API_URL}/kb-docs/${encodeURIComponent(filename)}/content`)
       .then((res) => {
+        if (res.status === 404) throw new Error('NOT_IN_FOLDER');
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         return res.json();
       })
@@ -71,7 +75,13 @@ export default function DocumentPreviewModal({ filename, highlight, onClose }: D
 
   const renderBody = () => {
     if (error) {
-      return <div className="doc-preview__empty">Couldn't load this document: {error}</div>;
+      return (
+        <div className="doc-preview__empty">
+          {error.includes('NOT_IN_FOLDER')
+            ? `This guideline file (${filename}) is not in the app's guideline folder, so it can't be shown here. Copy the PDF into backend/data/guidelines with exactly this name.`
+            : `Couldn't load this document: ${error}`}
+        </div>
+      );
     }
     if (text == null) {
       return <div className="doc-preview__empty">Loading document…</div>;
@@ -150,6 +160,14 @@ export default function DocumentPreviewModal({ filename, highlight, onClose }: D
         <div className="doc-preview__header">
           <FileTypeBadge filename={filename} />
           <div className="doc-preview__title">{filename}</div>
+          <a
+            className="doc-preview__open"
+            href={`${API_URL}/kb-docs/${encodeURIComponent(filename)}${page ? `#page=${page}` : ''}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open PDF{page ? ` at page ${page}` : ''}
+          </a>
           <a
             className="doc-preview__action"
             href={`${API_URL}/kb-docs/${encodeURIComponent(filename)}`}

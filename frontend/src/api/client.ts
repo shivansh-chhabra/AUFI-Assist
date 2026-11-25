@@ -51,6 +51,16 @@ export async function sendMessage(
   return { ...raw, answer: raw.reply };
 }
 
+/** POST /chat/back: take back the last answer and get that question again. */
+export async function goBack(conversationId?: string): Promise<ChatResponse> {
+  if (USE_MOCK_DATA) throw new Error('Going back is not available in demo mode.');
+  const raw = await request<ChatResponse>('/chat/back', {
+    method: 'POST',
+    body: JSON.stringify({ conversation_id: conversationId }),
+  });
+  return { ...raw, answer: raw.reply };
+}
+
 /**
  * POST /chat/stream (Server-Sent Events). Calls `onStep` with each
  * reasoning-trace line as the backend produces it, then resolves with the

@@ -134,7 +134,7 @@ def test_stale_button_payload_falls_back_to_the_typed_text(mp):
     pending = r.question.feature
     r2 = drive(s, "Yes", AnswerPayload(feature="some_old_feature", value="no"))
     # the payload's feature doesn't match the pending question, so it is ignored (not recorded as "no")
-    assert s.asked[0] == {"feature": pending, "text": "Question 0?", "answer": "yes"}
+    assert {k: v for k, v in s.asked[0].items() if k != "q"} == {"feature": pending, "text": "Question 0?", "answer": "yes"}
     assert r2.question.feature == "f1"
 
 
@@ -188,3 +188,20 @@ def test_wire_format_is_camel_case(mp):
     assert {"reply", "steps", "candidates", "question", "progress"} <= w.keys()
     assert w["progress"]["maxQuestions"] == 12 and "questionsAsked" in w["progress"]
     assert "informationGain" in w["question"] and w["explanation"] is None
+
+
+def test_go_back_restores_the_previous_question_and_scores(mp):
+    FakeScorer().install(mp); fake_rag(mp); fake_agent(mp)
+    s = Session(id="t"); r = drive(s, "fever")
+    p0 = {c.id: c.probability for c in r.candidates}
+    r = answer_yes(s, r); r = answer_yes(s, r)           # now on f2 after two yes answers
+    assert r.question.feature == "f2" and len(s.asked) == 2
+    back = pipeline.undo_last(s)
+    assert back.question.feature == "f1" and len(s.asked) == 1 and back.progress.questions_asked == 1
+    back = pipeline.undo_last(s)
+    assert back.question.feature == "f0" and not s.asked
+    assert {c.id: round(c.probability, 6) for c in back.candidates} == {k: round(v, 6) for k, v in p0.items()}
+    again = pipeline.undo_last(s)                         # nothing left to undo: same question stays
+    assert again.question.feature == "f0" and "no earlier answer" in again.reply
+    r = drive(s, "No", AnswerPayload(feature="f0", value="no"))   # and the case carries on normally
+    assert r.question.feature == "f1"

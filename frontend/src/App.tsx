@@ -5,7 +5,8 @@ import ChatThread from './components/ChatThread';
 import Composer from './components/Composer';
 import SearchOverlay from './components/SearchOverlay';
 import { useTheme } from './hooks/useTheme';
-import { fetchConversationHistory, fetchConversations, fetchKnowledgeBaseStatus, sendMessageStream } from './api/client';
+import { fetchConversationHistory, fetchConversations, fetchKnowledgeBaseStatus, goBack, sendMessageStream } from './api/client';
+import { deriveCase } from './utils/caseState';
 import { WORKSPACE } from './brand';
 import { API_URL, USE_MOCK_DATA } from './config';
 import type { AnswerOption, AnswerPayload, ChatMessage, Conversation, FollowUpQuestion, KnowledgeBaseStatus } from './types';
@@ -45,6 +46,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [liveSteps, setLiveSteps] = useState<string[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const [sidebarWidth, setSidebarWidth] = useState(272);
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth > 860);
 
@@ -91,10 +93,11 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
     return () => clearInterval(interval);
   }, []);
 
-  const lastMessage = messages[messages.length - 1];
-  const awaitingAnswer = !!(lastMessage?.role === 'ai' && lastMessage.question);
+  const { awaitingAnswer, inCase, progress } = deriveCase(messages);
+  const canGoBack = !USE_MOCK_DATA && !isLoading && awaitingAnswer && (progress?.questionsAsked ?? 0) > 0;
 
   const handleSend = async (text: string, answer?: AnswerPayload) => {
+    setDirection('forward');
     const userMessage: ChatMessage = { id: nextId(), role: 'user', text };
     setMessages((prev) => [...prev, userMessage]);
 
@@ -141,7 +144,32 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
     }
   };
 
+  const handleBack = async () => {
+    if (!canGoBack) return;
+    setDirection('back');
+    setIsLoading(true);
+    setLiveSteps([]);
+    try {
+      const r = await goBack(activeConversationId);
+      if (!r.question) return;
+      setMessages((prev) => {
+        // drop the answer just taken back and the question that followed it, then show the restored question
+        const restored: Partial<ChatMessage> = { question: r.question, progress: r.progress, candidates: r.candidates };
+        const n = prev.length;
+        if (n >= 3 && prev[n - 1].role === 'ai' && prev[n - 2].role === 'user' && prev[n - 3].role === 'ai') {
+          return [...prev.slice(0, n - 3), { ...prev[n - 3], ...restored }];
+        }
+        return [...prev, { id: nextId(), role: 'ai', text: r.reply, steps: [], ...restored } as ChatMessage];
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleQuickAnswer = (option: AnswerOption, question: FollowUpQuestion) => {
+    setDirection('forward');
     handleSend(option.label, { feature: question.feature, value: option.value });
   };
 
@@ -202,6 +230,9 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
           liveSteps={liveSteps}
           onAnswer={handleQuickAnswer}
           onPickExample={(text) => handleSend(text)}
+          onBack={handleBack}
+          direction={direction}
+          canGoBack={canGoBack}
           reportUrl={
             USE_MOCK_DATA || !activeConversationId
               ? undefined
@@ -212,6 +243,7 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
           onSend={(text) => handleSend(text)}
           disabled={isLoading}
           awaitingAnswer={awaitingAnswer}
+          compact={inCase}
         />
       </div>
 
