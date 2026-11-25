@@ -134,6 +134,8 @@ def retrieve(shortlist: list[str], query: str) -> dict:
             skipped.append(cid)
             continue
         for ct in CONTENT_TYPES:
+            if ct == "confirmatory_tests" and config.TESTS_FROM_PROTOCOL:
+                continue  # tests come from the fixed protocol document
             q = _INTENT[ct].format(name=condition_name(cid))
             if ct == "clinical_features" and case:
                 q += " " + case

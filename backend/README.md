@@ -20,3 +20,13 @@ Rules the backend enforces so the UI never shows something unsafe:
 Stop rule lives in `app/pipeline.py`: 12 questions, or top probability >= 0.80 after at least 3.
 
 Check: `pytest -q`, then open `/health` (all three say `ready` once the CSV and index exist).
+
+## Fixed test protocol (recommended tests)
+
+Recommended tests no longer come from retrieval. They are read from `app/protocols/test_protocols.json`
+(ICMR and MoHFW guidelines only) by `app/protocols/prescriber.py`, so the same shortlist and day of
+fever always give the same tests, and they appear even when the guideline index or Ollama is down.
+- If the top conditions are within `AUFI_CLOSE_MARGIN` (default 0.10) of each other, the tests that tell them apart are added.
+- The day of fever is read from the patient's first message ("fever for 4 days"); if absent, windows are shown as text.
+- Set `AUFI_TESTS_FROM_PROTOCOL=0` to go back to retrieval for tests.
+- After editing the JSON run `python scripts/render_protocols_md.py` to refresh `docs/TEST_PROTOCOLS.md`, then `pytest -q`.

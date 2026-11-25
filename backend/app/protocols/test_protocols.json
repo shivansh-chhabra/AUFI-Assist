@@ -1,0 +1,1671 @@
+{
+ "meta": {
+  "title": "AUFI Assist: fixed clinical test protocol",
+  "version": "1.0.0",
+  "status": "DRAFT: needs clinician review before use with patients",
+  "scope": "Only ICMR and MoHFW guidelines (MoHFW includes its directorates and programmes: NCVBDC, NCDC, NVHCP, DHR). No WHO, IAP or other-body documents.",
+  "built": "2026-11-24",
+  "how_to_read": "Each condition lists first-line tests with the day-of-illness window in which they are valid. Pair differentiators apply when the top two or three conditions are close. Every line carries source ids (see sources) and a section/page locator."
+ },
+ "sources": {
+  "S01": {
+   "title": "Diagnosis and Treatment of Malaria (NVBDCP)",
+   "issuer": "MoHFW",
+   "year": 2013,
+   "read": "full text",
+   "url": "https://clinicalestablishments.mohfw.gov.in/sites/default/files/standard-treatment-guidelines/892.pdf",
+   "kb_file": "malaria.pdf"
+  },
+  "S02": {
+   "title": "National Guidelines for Clinical Management of Dengue Fever (NCVBDC)",
+   "issuer": "MoHFW",
+   "year": 2023,
+   "read": "full text",
+   "url": "https://ncvbdc.mohfw.gov.in/Doc/National Guidelines for Clinical Management of Dengue Fever 2023.pdf",
+   "kb_file": "dengue.pdf"
+  },
+  "S03": {
+   "title": "National Guidelines for Clinical Management of Chikungunya Fever (NCVBDC)",
+   "issuer": "MoHFW",
+   "year": 2023,
+   "read": "full text",
+   "url": "https://ncvbdc.mohfw.gov.in/Doc/National Guidelines for Clinical Management of Chikungunya Fever 2023.pdf",
+   "kb_file": "chikungunya.pdf"
+  },
+  "S04": {
+   "title": "Treatment Guidelines for Antimicrobial Use in Common Syndromes, 2nd ed.",
+   "issuer": "ICMR",
+   "year": 2019,
+   "read": "chapters 1-5 read",
+   "url": "https://www.icmr.gov.in/icmrobject/custom_data/pdf/resource-guidelines/Treatment_Guidelines_2019_Final.pdf",
+   "kb_file": "Treatment_Guidelines_2019_Final.pdf"
+  },
+  "S05": {
+   "title": "National Treatment Guidelines for Antimicrobial Use in Infectious Disease Syndromes, v2.0 (NCDC with ICMR)",
+   "issuer": "MoHFW",
+   "year": 2025,
+   "read": "sections 1-9 read",
+   "url": "https://ncdc.mohfw.gov.in/wp-content/uploads/2025/08/NTG-Version-31st-July-final.pdf",
+   "kb_file": null
+  },
+  "S06": {
+   "title": "National Guidelines: Diagnosis, Case Management, Prevention and Control of Leptospirosis (NCDC)",
+   "issuer": "MoHFW",
+   "year": 2015,
+   "read": "full text",
+   "url": "https://ncdc.mohfw.gov.in/wp-content/uploads/2024/04/File558.pdf",
+   "kb_file": null
+  },
+  "S07": {
+   "title": "DHR-ICMR Guidelines for Diagnosis and Management of Rickettsial Diseases in India",
+   "issuer": "ICMR",
+   "year": 2015,
+   "read": "full text",
+   "url": "https://icmr.gov.in/icmrobject/custom_data/pdf/resource-guidelines/DHR-ICMR Guidelines on Ricketesial Diseases.pdf",
+   "kb_file": null
+  },
+  "S08": {
+   "title": "National Guidelines for Diagnosis and Management of Viral Hepatitis (NVHCP)",
+   "issuer": "MoHFW",
+   "year": 2018,
+   "read": "hepatitis A/E sections read",
+   "url": "https://clinicalestablishments.mohfw.gov.in/sites/default/files/standard-treatment-guidelines/3591.pdf",
+   "kb_file": "diagnosis-management-viral-hepatitis.pdf"
+  },
+  "S09": {
+   "title": "Guidelines on categorization of seasonal influenza cases for testing, treatment and hospitalization (NCDC)",
+   "issuer": "MoHFW",
+   "year": 2016,
+   "read": "excerpts only",
+   "url": "https://ncdc.mohfw.gov.in/wp-content/uploads/2024/02/72513234671561442053-1.pdf",
+   "kb_file": null
+  },
+  "S10": {
+   "title": "Clinical Management Protocol for Seasonal Influenza (NCDC)",
+   "issuer": "MoHFW",
+   "year": 2019,
+   "read": "excerpts only",
+   "url": "https://ncdc.mohfw.gov.in/wp-content/uploads/2024/02/66872871241561442115.pdf",
+   "kb_file": null
+  },
+  "S11": {
+   "title": "Guidelines for management of co-infection of COVID-19 with other seasonal epidemic-prone diseases (DGHS)",
+   "issuer": "MoHFW",
+   "year": 2021,
+   "read": "excerpts only",
+   "url": "https://covid19dashboard.mohfw.gov.in/pdf/GuidelinesformanagementofcoinfectionofCOVID19withotherseasonalepidemicpronediseases.pdf",
+   "kb_file": null
+  },
+  "S12": {
+   "title": "TB screening guidance note (MoHFW, COVID-19 and TB)",
+   "issuer": "MoHFW",
+   "year": 2021,
+   "read": "excerpts only",
+   "url": "https://covid19dashboard.mohfw.gov.in/pdf/1TBCOVIDscreeningguidancenote.pdf",
+   "kb_file": null
+  },
+  "S13": {
+   "title": "Standard Treatment Workflow: Acute Rheumatic Fever (DHR, MoHFW)",
+   "issuer": "ICMR",
+   "year": 2024,
+   "read": "excerpts only",
+   "url": "https://icmr.gov.in/icmrobject/uploads/STWs/1726651147_1_acute_rheumatic_fever.pdf",
+   "kb_file": null
+  }
+ },
+ "tests": {
+  "cbc": {
+   "name": "Complete blood count with differential, haematocrit and platelet count",
+   "specimen": "blood",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "lft": {
+   "name": "Liver function tests (AST, ALT, bilirubin)",
+   "specimen": "blood",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "rft": {
+   "name": "Renal function tests (urea, creatinine)",
+   "specimen": "blood",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "urine_routine": {
+   "name": "Urine routine and microscopy",
+   "specimen": "urine",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "rbs": {
+   "name": "Random blood sugar",
+   "specimen": "blood",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "esr_crp": {
+   "name": "ESR and C-reactive protein",
+   "specimen": "blood",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "cpk": {
+   "name": "Serum creatine phosphokinase (CPK)",
+   "specimen": "blood",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "pt_inr": {
+   "name": "Prothrombin time / INR",
+   "specimen": "blood",
+   "role": "severity",
+   "tier": "routine"
+  },
+  "lactate": {
+   "name": "Serum lactate",
+   "specimen": "blood",
+   "role": "severity",
+   "tier": "routine"
+  },
+  "ecg_12lead": {
+   "name": "12-lead ECG",
+   "specimen": "-",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "echo": {
+   "name": "Echocardiogram",
+   "specimen": "-",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "cxr_pa": {
+   "name": "Chest X-ray (PA view)",
+   "specimen": "-",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "usg_abdomen": {
+   "name": "Ultrasonography of the abdomen",
+   "specimen": "-",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "eschar_exam": {
+   "name": "Skin examination for eschar (neck, axillae, chest, abdomen, groin) and lymph nodes",
+   "specimen": "bedside",
+   "role": "supportive",
+   "tier": "routine"
+  },
+  "serial_hct": {
+   "name": "Serial haematocrit and platelet count",
+   "specimen": "blood",
+   "role": "severity",
+   "tier": "routine"
+  },
+  "g6pd": {
+   "name": "G6PD status (guides primaquine for P. vivax)",
+   "specimen": "blood",
+   "role": "planning",
+   "tier": "routine"
+  },
+  "malaria_smear": {
+   "name": "Blood smear for malaria parasite (thick and thin)",
+   "specimen": "blood",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "malaria_rdt": {
+   "name": "Malaria rapid diagnostic test (bivalent Pf/Pv)",
+   "specimen": "blood",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "dengue_ns1_elisa": {
+   "name": "Dengue NS1 antigen (ELISA)",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "dengue_igm_mac": {
+   "name": "Dengue IgM capture ELISA (MAC-ELISA)",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "dengue_rt_pcr": {
+   "name": "Dengue RT-PCR",
+   "specimen": "acute-phase serum",
+   "role": "diagnostic",
+   "tier": "specialised"
+  },
+  "chik_rt_pcr": {
+   "name": "Chikungunya RT-PCR",
+   "specimen": "serum or whole blood",
+   "role": "diagnostic",
+   "tier": "specialised"
+  },
+  "chik_igm_mac": {
+   "name": "Chikungunya IgM capture ELISA (MAC-ELISA)",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "blood_culture_2": {
+   "name": "Blood cultures, two sets, before any antibiotic",
+   "specimen": "blood",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "urine_culture": {
+   "name": "Urine culture before antibiotics",
+   "specimen": "midstream urine",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "scrub_igm_elisa": {
+   "name": "Scrub typhus / rickettsial IgM ELISA",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "weil_felix": {
+   "name": "Weil-Felix test (OX2, OX19, OXK)",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "rickettsia_pcr": {
+   "name": "Rickettsial PCR",
+   "specimen": "eschar sample or whole blood",
+   "role": "diagnostic",
+   "tier": "specialised"
+  },
+  "lepto_rapid": {
+   "name": "Leptospirosis rapid screening test (immunochromatography or slide agglutination)",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "lepto_igm_elisa": {
+   "name": "Leptospirosis IgM ELISA",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "lepto_mat": {
+   "name": "Microscopic agglutination test (MAT) for Leptospira",
+   "specimen": "paired sera",
+   "role": "diagnostic",
+   "tier": "specialised"
+  },
+  "lepto_pcr": {
+   "name": "Leptospira PCR",
+   "specimen": "blood, urine or CSF",
+   "role": "diagnostic",
+   "tier": "specialised"
+  },
+  "lepto_culture": {
+   "name": "Leptospira culture (EMJH medium)",
+   "specimen": "blood",
+   "role": "diagnostic",
+   "tier": "specialised"
+  },
+  "igm_anti_hav": {
+   "name": "IgM anti-HAV",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "igm_anti_hev": {
+   "name": "IgM anti-HEV",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "influenza_rt_pcr": {
+   "name": "Influenza RT-PCR",
+   "specimen": "nasopharyngeal / oropharyngeal swab",
+   "role": "diagnostic",
+   "tier": "specialised"
+  },
+  "aso_titre": {
+   "name": "Anti-streptolysin O (ASO) titre",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "anti_dnase_b": {
+   "name": "Anti-DNase B",
+   "specimen": "serum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "throat_swab_antigen": {
+   "name": "Throat swab rapid streptococcal antigen test",
+   "specimen": "throat swab",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "throat_swab_culture": {
+   "name": "Throat swab culture for group A streptococcus",
+   "specimen": "throat swab",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "tb_naat": {
+   "name": "TB nucleic acid amplification test (CBNAAT / Truenat)",
+   "specimen": "sputum",
+   "role": "diagnostic",
+   "tier": "routine"
+  },
+  "dengue_rdt": {
+   "name": "Dengue rapid antigen/antibody tests",
+   "specimen": "serum",
+   "role": "not_recommended",
+   "tier": "routine"
+  },
+  "widal": {
+   "name": "Widal test",
+   "specimen": "serum",
+   "role": "not_recommended",
+   "tier": "routine"
+  },
+  "dark_field": {
+   "name": "Dark-field microscopy for Leptospira (as a sole test)",
+   "specimen": "blood or urine",
+   "role": "not_recommended",
+   "tier": "routine"
+  },
+  "scrub_rapid": {
+   "name": "Rapid tests for scrub typhus",
+   "specimen": "serum",
+   "role": "not_recommended",
+   "tier": "routine"
+  }
+ },
+ "common_workup": [
+  {
+   "id": "day_1_2",
+   "from_day": 1,
+   "to_day": 2,
+   "tests": [],
+   "text": "Fever day 1-2: defer investigations and antimicrobials unless the patient has features of sepsis.",
+   "src": [
+    "S05:§3.1 p.27",
+    "S04:protocol p.9"
+   ]
+  },
+  {
+   "id": "day_3_4",
+   "from_day": 3,
+   "to_day": 4,
+   "tests": [
+    "cbc",
+    "lft",
+    "rft",
+    "urine_routine",
+    "rbs",
+    "malaria_smear",
+    "malaria_rdt"
+   ],
+   "text": "Fever day 3-4: blood count with differential, liver and renal function, urine examination, blood sugar, malaria smear and RDT, and a dengue antigen test if suspicion is high.",
+   "src": [
+    "S05:§3.1 p.27"
+   ]
+  },
+  {
+   "id": "day_5_plus",
+   "from_day": 5,
+   "to_day": null,
+   "tests": [
+    "blood_culture_2",
+    "cxr_pa"
+   ],
+   "text": "Fever beyond 5 days: the day 3-4 tests plus two sets of blood cultures and a chest X-ray; add IgM serology for dengue, chikungunya, scrub typhus and leptospirosis according to clinical suspicion.",
+   "src": [
+    "S05:§3.1 p.27",
+    "S04:protocol p.9"
+   ]
+  },
+  {
+   "id": "day_7_plus",
+   "from_day": 7,
+   "to_day": null,
+   "tests": [
+    "usg_abdomen"
+   ],
+   "text": "Fever beyond 7 days: all of the above plus an abdominal ultrasound.",
+   "src": [
+    "S05:§3.1 p.27",
+    "S04:protocol p.9"
+   ]
+  }
+ ],
+ "conditions": {
+  "malaria": {
+   "first_line": [
+    {
+     "test": "malaria_smear",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Send for every suspected case; repeat once if the first smear is negative in an endemic area.",
+     "src": [
+      "S04:§2.1.5 p.7",
+      "S01:flow charts pp.3-5"
+     ]
+    },
+    {
+     "test": "malaria_rdt",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Bivalent RDT is used when a microscopy result will not be back within 24 hours; if malaria is still strongly suspected after a negative RDT, also send a slide.",
+     "src": [
+      "S01:flow charts pp.3-5"
+     ]
+    }
+   ],
+   "also": [
+    {
+     "test": "g6pd",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Primaquine for P. vivax is guided by G6PD status; it is contraindicated in G6PD deficiency, infants and pregnancy.",
+     "src": [
+      "S04:§2.2.4.3 p.15",
+      "S01:p.6"
+     ]
+    }
+   ],
+   "if_severe": [
+    {
+     "test": "malaria_smear",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Severe malaria needs a smear with parasite count reported within an hour, plus haemoglobin, blood glucose and urine examination; refer to a facility that can give parenteral treatment.",
+     "src": [
+      "S01:p.16"
+     ]
+    },
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Haemoglobin for severe anaemia.",
+     "src": [
+      "S01:p.16"
+     ]
+    },
+    {
+     "test": "rbs",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Hypoglycaemia is a complication of severe malaria.",
+     "src": [
+      "S01:pp.14,16"
+     ]
+    },
+    {
+     "test": "urine_routine",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Required in the severe malaria work-up.",
+     "src": [
+      "S01:p.16"
+     ]
+    }
+   ],
+   "notes": []
+  },
+  "dengue": {
+   "first_line": [
+    {
+     "test": "dengue_ns1_elisa",
+     "when": {
+      "from": 1,
+      "to": 5,
+      "text": "day 1-5"
+     },
+     "why": "NS1 is sent for samples collected on day 1 to 5 of fever; the lab should be told the day of onset and the day of collection.",
+     "src": [
+      "S02:§6.2 p.32",
+      "S02:§6.1.1 p.30"
+     ]
+    },
+    {
+     "test": "dengue_igm_mac",
+     "when": {
+      "from": 6,
+      "to": null,
+      "text": "after day 5"
+     },
+     "why": "IgM is sent after day 5; it is usually detectable by day 5 but can appear later.",
+     "src": [
+      "S02:§6.2 p.32",
+      "S02:§6.1.2 p.30"
+     ]
+    },
+    {
+     "test": "dengue_rt_pcr",
+     "when": {
+      "from": 1,
+      "to": 5,
+      "text": "early illness, under 5 days"
+     },
+     "why": "RT-PCR on acute-phase serum has replaced virus isolation as the standard for detecting virus.",
+     "src": [
+      "S02:§6.1.4 p.31",
+      "S11:laboratory testing table"
+     ]
+    },
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Recommended for all patients with warning signs and all patients with fever beyond 3 days; look for leucopenia, falling platelets and a rising haematocrit.",
+     "src": [
+      "S02:§7.1 p.33",
+      "S02:§4.2 p.20"
+     ]
+    }
+   ],
+   "also": [
+    {
+     "test": "rbs",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Recommended together with the blood count in the same patients.",
+     "src": [
+      "S02:§7.1 p.33"
+     ]
+    },
+    {
+     "test": "lft",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Adults, patients with comorbidities, shock or complications.",
+     "src": [
+      "S02:§7.3 p.35"
+     ]
+    },
+    {
+     "test": "rft",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Adults, patients with comorbidities, shock or complications.",
+     "src": [
+      "S02:§7.3 p.35"
+     ]
+    }
+   ],
+   "if_severe": [
+    {
+     "test": "serial_hct",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Haematocrit every 4-6 hours in stable cases, more often if unstable; a rise of 10% above baseline is an early sign of plasma leakage.",
+     "src": [
+      "S02:§7.3 pp.34-35"
+     ]
+    },
+    {
+     "test": "cxr_pa",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Chest X-ray or ultrasound helps detect plasma leakage.",
+     "src": [
+      "S02:p.15"
+     ]
+    },
+    {
+     "test": "usg_abdomen",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Ultrasound helps detect plasma leakage and gall bladder wall thickening.",
+     "src": [
+      "S02:p.15",
+      "S04:§2.3.6.6 p.23"
+     ]
+    }
+   ],
+   "not_recommended": [
+    {
+     "test": "dengue_rdt",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "The national programme does not recommend rapid tests for diagnosing dengue or guiding management, because accuracy varies from batch to batch.",
+     "src": [
+      "S02:§6.1.7 pp.31-32"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "IgG ELISA indicates past infection only and is not a diagnostic test for acute dengue.",
+     "src": [
+      "S02:§6.1.5 p.31"
+     ]
+    }
+   ]
+  },
+  "chikungunya": {
+   "first_line": [
+    {
+     "test": "chik_rt_pcr",
+     "when": {
+      "from": 0,
+      "to": 7,
+      "text": "day 0-7"
+     },
+     "why": "RT-PCR is used between day 0 and day 7 of symptoms (viral RNA is detectable up to about 8 days).",
+     "src": [
+      "S03:§3.2 p.8",
+      "S03:§3.1.3 p.8"
+     ]
+    },
+    {
+     "test": "chik_igm_mac",
+     "when": {
+      "from": 8,
+      "to": null,
+      "text": "after day 7"
+     },
+     "why": "IgM serology is used after day 7; repeat testing in 5 to 10 days if suspicion persists and the first result is negative.",
+     "src": [
+      "S03:§3.2 p.8",
+      "S03:§3.1.2 p.7"
+     ]
+    },
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Leucopenia with lymphocyte predominance is usual and severe thrombocytopenia is rare; useful to separate it from dengue.",
+     "src": [
+      "S03:§3.2 p.8",
+      "S03:Table 3 p.12"
+     ]
+    }
+   ],
+   "also": [
+    {
+     "test": "esr_crp",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "ESR is usually raised and CRP rises in the acute phase.",
+     "src": [
+      "S03:§3.2 p.8"
+     ]
+    },
+    {
+     "test": "malaria_smear",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Dengue, malaria and other tropical fevers must be excluded at first contact.",
+     "src": [
+      "S03:§6.1.2.1 p.26",
+      "S03:§4.2 p.11"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "Dengue and chikungunya can occur together, so a positive result for one does not exclude the other.",
+     "src": [
+      "S03:§5.3.5 p.20"
+     ]
+    }
+   ]
+  },
+  "typhoid": {
+   "first_line": [
+    {
+     "test": "blood_culture_2",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Blood culture is the gold standard; two sets are drawn before empiric antibiotics.",
+     "src": [
+      "S05:§3.2 p.29",
+      "S04:§2.1.5 p.7"
+     ]
+    },
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Part of the day 3-4 baseline work-up for undifferentiated fever.",
+     "src": [
+      "S05:§3.1 p.27"
+     ]
+    }
+   ],
+   "not_recommended": [
+    {
+     "test": "widal",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Avoid the Widal test for diagnosis; it may also be negative before the second week of fever.",
+     "src": [
+      "S05:§3.2 p.29",
+      "S02:§8.1.4 p.50"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "Suspect typhoid with continuous fever, gastrointestinal symptoms and splenomegaly.",
+     "src": [
+      "S04:§2.1.4 p.6"
+     ]
+    }
+   ]
+  },
+  "scrub_typhus": {
+   "first_line": [
+    {
+     "test": "eschar_exam",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "An eschar is the single most useful clue; look in moist skin folds, where it may lack the black scab. Also look for regional lymphadenopathy and rash.",
+     "src": [
+      "S04:§2.1.3 p.6",
+      "S07:§2 p.12"
+     ]
+    },
+    {
+     "test": "scrub_igm_elisa",
+     "when": {
+      "from": 5,
+      "to": null,
+      "text": "from about day 5-7"
+     },
+     "why": "IgM capture ELISA is the mainstay of laboratory diagnosis; a significant IgM titre appears at the end of the first week (OD cut-off 0.5).",
+     "src": [
+      "S07:§3.2.1 p.15",
+      "S04:§2.4.4 p.27"
+     ]
+    },
+    {
+     "test": "weil_felix",
+     "when": {
+      "from": 5,
+      "to": null,
+      "text": "after 5-7 days"
+     },
+     "why": "Can be used at primary level only after 5 to 7 days of fever; a titre of 1:80 or more suggests possible infection. Low sensitivity.",
+     "src": [
+      "S07:§3.2.1 p.15"
+     ]
+    }
+   ],
+   "also": [
+    {
+     "test": "rickettsia_pcr",
+     "when": {
+      "from": 1,
+      "to": 7,
+      "text": "first week"
+     },
+     "why": "Best on eschar or blood in the first week; available only at a few centres.",
+     "src": [
+      "S07:§3.2.1 p.15"
+     ]
+    },
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Thrombocytopenia is seen in most patients.",
+     "src": [
+      "S07:§3.2.2 p.15"
+     ]
+    },
+    {
+     "test": "lft",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Raised transaminases are common, with ALT usually higher than AST.",
+     "src": [
+      "S07:§3.2.2 p.16",
+      "S04:§2.4.3 p.26"
+     ]
+    },
+    {
+     "test": "cxr_pa",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Bilateral infiltrates are common; pneumonia is a frequent complication.",
+     "src": [
+      "S07:§3.3.3 p.16"
+     ]
+    }
+   ],
+   "not_recommended": [
+    {
+     "test": "scrub_rapid",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Rapid tests are not recommended for scrub typhus at the present stage.",
+     "src": [
+      "S07:§3.2.1 p.15"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "Suspect a rickettsial infection in an undifferentiated fever of 5 days or more; if an eschar is present, a shorter fever can be scrub typhus.",
+     "src": [
+      "S07:§3.1.1 p.14"
+     ]
+    }
+   ]
+  },
+  "leptospirosis": {
+   "first_line": [
+    {
+     "test": "lepto_rapid",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "A rapid test is used for screening at PHC and CHC level; results need confirmation by ELISA.",
+     "src": [
+      "S06:§4.3 p.14",
+      "S06:§5.1 p.17"
+     ]
+    },
+    {
+     "test": "lepto_igm_elisa",
+     "when": {
+      "from": 5,
+      "to": null,
+      "text": "from about day 5-7"
+     },
+     "why": "ELISA can detect antibody earlier than MAT and tells recent from past infection; antibody tests are generally positive only after 5-7 days.",
+     "src": [
+      "S06:Annexure 1 p.27",
+      "S04:§2.1.5 p.7"
+     ]
+    },
+    {
+     "test": "cpk",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Marked CPK elevation points to leptospirosis and helps separate it from viral and alcoholic hepatitis.",
+     "src": [
+      "S06:§3.1.1 p.8",
+      "S06:§3.2 pp.10-11"
+     ]
+    },
+    {
+     "test": "urine_routine",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Some renal involvement is almost always present: proteinuria, casts, haematuria.",
+     "src": [
+      "S06:§3.1.1 p.8",
+      "S06:§4.3 p.14"
+     ]
+    }
+   ],
+   "also": [
+    {
+     "test": "lepto_mat",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Gold standard for serovar-specific antibodies; a rising titre between acute and convalescent sera is confirmatory. State or reference laboratory.",
+     "src": [
+      "S06:§4.1 p.13",
+      "S06:Annexure 1 p.26"
+     ]
+    },
+    {
+     "test": "lepto_pcr",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Useful in the first days when antibodies are not yet detectable; state or reference laboratory.",
+     "src": [
+      "S06:Annexure 1 p.27"
+     ]
+    },
+    {
+     "test": "lepto_culture",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Blood culture within 10 days of onset and before antibiotics; slow and specialised.",
+     "src": [
+      "S06:Annexure 1 p.23"
+     ]
+    },
+    {
+     "test": "lft",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Transaminases are normal or only mildly raised (hundreds of IU/L).",
+     "src": [
+      "S06:§3.2 p.10"
+     ]
+    },
+    {
+     "test": "rft",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Urea and creatinine are raised when the kidney is involved.",
+     "src": [
+      "S06:§4.3 p.14"
+     ]
+    },
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Neutrophilia and thrombocytopenia are typical.",
+     "src": [
+      "S06:§4.3 p.14"
+     ]
+    }
+   ],
+   "not_recommended": [
+    {
+     "test": "dark_field",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Dark-field microscopy has low sensitivity and specificity and is not recommended as the only test.",
+     "src": [
+      "S06:Annexure 1 p.25"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "Leptospira serology cross-reacts with hepatitis A and E, so read serology together with the enzyme pattern and confirm with MAT or PCR where possible.",
+     "src": [
+      "S06:Annexure 1 note p.28"
+     ]
+    }
+   ]
+  },
+  "viral_ili": {
+   "first_line": [],
+   "conditional": [
+    {
+     "if_": "Category C features: breathlessness, chest pain, drowsiness, low blood pressure, bluish discolouration, or worsening of a chronic illness",
+     "test": "influenza_rt_pcr",
+     "why": "These patients should be tested for influenza (swab RT-PCR) and hospitalised; empirical oseltamivir is started while the result is pending.",
+     "src": [
+      "S09:Category C",
+      "S10:§3 Investigations",
+      "S11:laboratory testing table"
+     ]
+    }
+   ],
+   "not_recommended": [],
+   "notes": [
+    {
+     "text": "No influenza test is required for Category A (mild fever with cough or sore throat) or Category B (high-grade fever, severe sore throat, or a high-risk group).",
+     "src": [
+      "S09:Category A and B"
+     ]
+    }
+   ]
+  },
+  "hepatitis_a_e": {
+   "first_line": [
+    {
+     "test": "lft",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "In acute hepatitis with jaundice, bilirubin is above 2.5 mg/dL and ALT is more than 10 times the upper limit of normal.",
+     "src": [
+      "S08:p.17",
+      "S08:p.44"
+     ]
+    },
+    {
+     "test": "igm_anti_hav",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "IgM anti-HAV marks acute hepatitis A; it appears 5-10 days before symptoms and persists up to 6 months.",
+     "src": [
+      "S08:Laboratory Diagnosis p.17"
+     ]
+    },
+    {
+     "test": "igm_anti_hev",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Definitive diagnosis of hepatitis E rests on IgM anti-HEV; suspect it when hepatitis A is excluded or when several cases cluster.",
+     "src": [
+      "S08:Hepatitis E p.44"
+     ]
+    }
+   ],
+   "if_severe": [
+    {
+     "test": "pt_inr",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Suspect acute liver failure with confusion, persistent vomiting, bleeding or hypoglycaemia; refer when sensorium is altered and INR is above 1.5.",
+     "src": [
+      "S08:pp.45-46"
+     ]
+    },
+    {
+     "test": "rbs",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Repeated hypoglycaemia is a warning sign of liver failure.",
+     "src": [
+      "S08:p.46"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "Hepatitis A and E cannot be told apart, or from other viral hepatitis, on clinical grounds alone.",
+     "src": [
+      "S08:p.44"
+     ]
+    }
+   ]
+  },
+  "occult_bacteraemia": {
+   "first_line": [
+    {
+     "test": "blood_culture_2",
+     "when": {
+      "from": 5,
+      "to": null,
+      "text": "fever beyond 5 days, or earlier if septic"
+     },
+     "why": "At least two sets before empiric antibiotics.",
+     "src": [
+      "S04:§2.1.5 p.7",
+      "S05:§3.1 p.27"
+     ]
+    },
+    {
+     "test": "urine_routine",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "White cells, protein and blood point to a urinary source.",
+     "src": [
+      "S04:§2.1.5 p.7",
+      "S05:§3.1 p.27"
+     ]
+    },
+    {
+     "test": "urine_culture",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Collect before antibiotics when pyelonephritis or urosepsis is possible.",
+     "src": [
+      "S05:§5.2 p.40"
+     ]
+    },
+    {
+     "test": "cxr_pa",
+     "when": {
+      "from": 5,
+      "to": null,
+      "text": "fever beyond 5 days"
+     },
+     "why": "Chest X-ray looks for an occult pneumonia.",
+     "src": [
+      "S04:§2.1.5 p.7",
+      "S05:§3.1 p.27"
+     ]
+    },
+    {
+     "test": "usg_abdomen",
+     "when": {
+      "from": 7,
+      "to": null,
+      "text": "fever beyond 7 days"
+     },
+     "why": "Ultrasound looks for hepatic, renal or other intra-abdominal sources.",
+     "src": [
+      "S04:§2.1.5 p.7",
+      "S05:§3.1 p.27"
+     ]
+    }
+   ],
+   "also": [
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Leucocytosis can point to a bacterial source.",
+     "src": [
+      "S04:§2.1.5 p.7"
+     ]
+    },
+    {
+     "test": "lft",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Part of the baseline work-up.",
+     "src": [
+      "S05:§3.1 p.27"
+     ]
+    }
+   ],
+   "if_severe": [
+    {
+     "test": "lactate",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "In suspected sepsis, measure lactate and draw blood cultures before antibiotics.",
+     "src": [
+      "S04:§3.5 p.30",
+      "S05:p.31"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "The primary source is often occult, most often pneumonia, an intra-abdominal infection or urosepsis, and may be silent in the elderly.",
+     "src": [
+      "S04:§2.1.4 p.6"
+     ]
+    }
+   ]
+  },
+  "rheumatic_fever": {
+   "first_line": [
+    {
+     "test": "throat_swab_antigen",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Evidence of a preceding streptococcal infection is essential for the diagnosis: throat antigen or culture positive, or a raised ASO titre.",
+     "src": [
+      "S13:Diagnosis based on Jones criteria"
+     ]
+    },
+    {
+     "test": "throat_swab_culture",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Same essential criterion as above.",
+     "src": [
+      "S13:Diagnosis based on Jones criteria"
+     ]
+    },
+    {
+     "test": "aso_titre",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Raised ASO titre (above 320 U) counts as evidence of preceding streptococcal infection.",
+     "src": [
+      "S13:Diagnosis based on Jones criteria"
+     ]
+    },
+    {
+     "test": "esr_crp",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Minor criteria: ESR above 60 mm/h or CRP 3 mg/dL or more with polyarthralgia; ESR above 30 with monoarthralgia.",
+     "src": [
+      "S13:Diagnosis based on Jones criteria"
+     ]
+    },
+    {
+     "test": "ecg_12lead",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "A prolonged PR interval for age is a minor criterion unless carditis is already a major criterion.",
+     "src": [
+      "S13:Diagnosis based on Jones criteria"
+     ]
+    },
+    {
+     "test": "echo",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Monitor for carditis in all patients.",
+     "src": [
+      "S13:Management"
+     ]
+    }
+   ],
+   "also": [
+    {
+     "test": "cbc",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Total and differential leucocyte count.",
+     "src": [
+      "S13:Investigations"
+     ]
+    },
+    {
+     "test": "cxr_pa",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Chest X-ray as part of the cardiac assessment.",
+     "src": [
+      "S13:Investigations"
+     ]
+    },
+    {
+     "test": "anti_dnase_b",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": ""
+     },
+     "why": "Optional additional marker of recent streptococcal infection.",
+     "src": [
+      "S13:Investigations"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "Think of rheumatic fever when there is migratory arthritis after a significant sore throat.",
+     "src": [
+      "S04:§2.1.4 p.7"
+     ]
+    }
+   ]
+  },
+  "tb": {
+   "first_line": [
+    {
+     "test": "cxr_pa",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Chest X-ray in anyone screened positive: cough, fever or significant weight loss/night sweats; also if chest findings are present.",
+     "src": [
+      "S12:TB screening",
+      "S04:§2.1.5 p.7"
+     ]
+    },
+    {
+     "test": "tb_naat",
+     "when": {
+      "from": null,
+      "to": null,
+      "text": "any day of illness"
+     },
+     "why": "Upfront nucleic acid amplification test (CBNAAT/Truenat) on a sputum sample in those screened positive.",
+     "src": [
+      "S12:TB screening"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "Screen for TB with the four-symptom complex: cough or fever for more than 2 weeks, significant weight loss, night sweats. Consider TB in any prolonged undifferentiated fever, especially with weight loss.",
+     "src": [
+      "S12:TB screening",
+      "S04:§2.1.4 p.7"
+     ]
+    }
+   ]
+  }
+ },
+ "pair_differentiators": [
+  {
+   "pair": [
+    "dengue",
+    "chikungunya"
+   ],
+   "tests": [
+    "cbc",
+    "dengue_ns1_elisa",
+    "dengue_igm_mac",
+    "chik_rt_pcr",
+    "chik_igm_mac"
+   ],
+   "contrast": "Leucopenia, thrombocytopenia and a raised haematocrit are common in dengue and infrequent in chikungunya; bleeding, organ involvement and shock are common in severe dengue and rare in chikungunya; polyarthralgia is frequent in chikungunya and less common in dengue. Both can occur together.",
+   "src": [
+    "S03:Table 3 p.12",
+    "S03:§5.3.5 p.20"
+   ]
+  },
+  {
+   "pair": [
+    "leptospirosis",
+    "hepatitis_a_e"
+   ],
+   "tests": [
+    "lft",
+    "cpk",
+    "igm_anti_hav",
+    "igm_anti_hev",
+    "lepto_igm_elisa",
+    "urine_routine"
+   ],
+   "contrast": "In leptospirosis AST and ALT are normal or only mildly raised and CPK is high; in viral hepatitis ALT is markedly raised and CPK is normal. Leptospira serology cross-reacts with hepatitis A and E, so do not rely on serology alone.",
+   "src": [
+    "S06:§3.2 pp.10-11",
+    "S06:Annexure 1 note p.28"
+   ]
+  },
+  {
+   "pair": [
+    "dengue",
+    "hepatitis_a_e"
+   ],
+   "tests": [
+    "lft",
+    "igm_anti_hav",
+    "igm_anti_hev",
+    "dengue_ns1_elisa",
+    "dengue_igm_mac",
+    "cbc"
+   ],
+   "contrast": "Dengue usually causes a mild to moderate transaminase rise with uncommon jaundice, plus falling platelets and rising haematocrit; acute viral hepatitis shows jaundice with bilirubin above 2.5 mg/dL and ALT above 10 times normal.",
+   "src": [
+    "S04:§2.3.6.3 p.22",
+    "S08:p.17"
+   ]
+  },
+  {
+   "pair": [
+    "rheumatic_fever",
+    "chikungunya"
+   ],
+   "tests": [
+    "aso_titre",
+    "throat_swab_antigen",
+    "ecg_12lead",
+    "esr_crp",
+    "chik_rt_pcr",
+    "chik_igm_mac"
+   ],
+   "contrast": "Rheumatic fever gives fleeting, migratory arthritis of the large joints, more often in children, after a recent sore throat, with a raised ASO titre and diagnosis by Jones criteria (ECG PR interval, echocardiogram for carditis). Chikungunya gives symmetrical, mainly small-joint polyarthralgia and is confirmed by RT-PCR or IgM.",
+   "src": [
+    "S03:§4.2 p.11",
+    "S03:§5.2.1 p.14",
+    "S13:Diagnosis based on Jones criteria"
+   ]
+  },
+  {
+   "pair": [
+    "scrub_typhus",
+    "dengue"
+   ],
+   "tests": [
+    "eschar_exam",
+    "scrub_igm_elisa",
+    "dengue_ns1_elisa",
+    "dengue_igm_mac",
+    "cbc",
+    "lft"
+   ],
+   "contrast": "An eschar, regional lymphadenopathy or rash favours scrub typhus. Both can cause low platelets and mild hepatitis, so serology decides; a rising haematocrit favours dengue.",
+   "src": [
+    "S04:§2.1.4 p.6",
+    "S04:conclusion p.27",
+    "S02:§7.3 p.34"
+   ]
+  },
+  {
+   "pair": [
+    "scrub_typhus",
+    "leptospirosis"
+   ],
+   "tests": [
+    "eschar_exam",
+    "scrub_igm_elisa",
+    "lepto_igm_elisa",
+    "lepto_rapid",
+    "cpk",
+    "urine_routine"
+   ],
+   "contrast": "Eschar and lymphadenopathy point to scrub typhus; conjunctival suffusion, calf muscle tenderness, a high CPK and urine abnormalities point to leptospirosis.",
+   "src": [
+    "S04:§2.1.4 p.6",
+    "S06:§3.1.1 p.8",
+    "S07:§2 p.12"
+   ]
+  },
+  {
+   "pair": [
+    "typhoid",
+    "occult_bacteraemia"
+   ],
+   "tests": [
+    "blood_culture_2",
+    "urine_routine",
+    "urine_culture",
+    "cxr_pa",
+    "usg_abdomen"
+   ],
+   "contrast": "Blood culture serves both. A chest, urinary or abdominal focus on X-ray, urine tests or ultrasound supports secondary bacteraemia; continuous fever with gastrointestinal symptoms and splenomegaly supports typhoid.",
+   "src": [
+    "S04:§2.1.4 p.6",
+    "S04:§2.1.5 p.7"
+   ]
+  },
+  {
+   "pair": [
+    "tb",
+    "occult_bacteraemia"
+   ],
+   "tests": [
+    "tb_naat",
+    "cxr_pa",
+    "blood_culture_2"
+   ],
+   "contrast": "Prolonged fever with weight loss or night sweats calls for chest X-ray and NAAT; bacteraemia needs cultures and a search for a focus. Avoid empiric fluoroquinolones where TB is possible, because they can mask TB.",
+   "src": [
+    "S12:TB screening",
+    "S04:§4.3.3 p.39"
+   ]
+  },
+  {
+   "pair": [
+    "viral_ili",
+    "dengue"
+   ],
+   "tests": [
+    "dengue_ns1_elisa",
+    "dengue_igm_mac",
+    "malaria_smear",
+    "malaria_rdt"
+   ],
+   "contrast": "Mild influenza-like illness needs no influenza test (influenza RT-PCR only for Category C), so the useful tests are those for dengue and malaria, which have specific management.",
+   "src": [
+    "S09:Category A and B",
+    "S02:§6 p.30"
+   ]
+  },
+  {
+   "pair": [
+    "malaria",
+    "dengue"
+   ],
+   "tests": [
+    "malaria_smear",
+    "malaria_rdt",
+    "dengue_ns1_elisa",
+    "dengue_igm_mac",
+    "cbc"
+   ],
+   "contrast": "Malaria should be excluded in every acute undifferentiated fever, because it has specific treatment and can coexist with dengue.",
+   "src": [
+    "S04:§2.1.4 p.6",
+    "S02:§8.1.4 p.49"
+   ]
+  }
+ ],
+ "default_pair_rule": "For a close pair with no explicit entry, send the diagnostic tests of each condition that the other does not share, routine laboratory tests before reference-laboratory tests, filtered to the day of fever when it is known. If nothing remains, send the first-line tests of both.",
+ "conflicts": [
+  "Dengue rapid tests: ICMR 2019 (S04 §2.1.5) lists a dengue rapid NS1 antigen test; NCVBDC 2023 (S02 §6.1.7) does not recommend rapid tests. This protocol follows NCVBDC, the national programme and the later document.",
+  "Day 3-4 baseline: ICMR 2019 lists blood count, malaria smear and RDT; the joint NCDC-ICMR 2025 guideline adds liver and renal function, urine examination and blood sugar. This protocol follows the 2025 version.",
+  "Dengue NS1 window: NCVBDC 2023 says NS1 for day 1-5 and IgM after day 5; ICMR 2019 says NS1 can diagnose during the first week. This protocol uses NCVBDC."
+ ],
+ "open_items": [
+  "TB: the four-symptom screen, chest X-ray and upfront NAAT come from a MoHFW note (S12) read in excerpt. Confirm against the current NTEP Technical and Operational Guidelines, including whether sputum smear remains first-line in your setting and that antibody (serology) tests are not to be used (relayed by secondary summaries only, so not included).",
+  "Influenza, rheumatic fever, TB and co-infection sources (S09-S13) were read as excerpts; confirm the exact wording against the full documents.",
+  "Page numbers are the printed page numbers seen in the documents and may differ from PDF page numbers.",
+  "No clinician has reviewed this file yet. Marked as DRAFT until one signs it off."
+ ]
+}

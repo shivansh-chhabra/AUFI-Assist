@@ -40,3 +40,10 @@ LLM_CHUNK_CHARS = int(os.getenv("AUFI_LLM_CHUNK_CHARS", "1000"))
 
 # --- scoring table (P(feature | condition) CSV read by scoring/diagnose.py) ------
 SCORING_TABLE = Path(os.getenv("AUFI_SCORING_TABLE", BACKEND_DIR / "data" / "scoring_table.csv"))
+
+# --- fixed test protocol (app/protocols) -----------------------------------------
+# When on, recommended tests come from the fixed ICMR/MoHFW document, not from retrieval.
+TESTS_FROM_PROTOCOL = os.getenv("AUFI_TESTS_FROM_PROTOCOL", "1") not in ("0", "false", "False")
+# Two conditions whose probabilities differ by no more than this are a "close call": the document's
+# differentiating tests are shown. Absolute probability, e.g. 0.10 = 10 percentage points.
+CLOSE_MARGIN = float(os.getenv("AUFI_CLOSE_MARGIN", "0.10"))

@@ -114,9 +114,9 @@ def test_retrieve_shape_floor_and_dedupe(index):
     assert len({p["text"] for p in ps if p["disease"] == "dengue"}) == len([p for p in ps if p["disease"] == "dengue"])
     p = ps[0]
     assert p["file"] == "icmr_dengue.pdf" and p["location"] == "pp. 3-4" and p["body"] == "ICMR" and 0 < p["relevance"] <= 1
-    assert raw["dropped_below_threshold"] == 6          # 2 conditions x 3 intents, one weak hit each
+    assert raw["dropped_below_threshold"] == 4          # 2 conditions x 2 intents (tests come from the protocol), one weak hit each
     assert raw["documents_in_index"] == 2
-    assert len(raw["filters"]) == 6
+    assert len(raw["filters"]) == 4
     assert "fever and rash" in index.calls[0][0] and "fever and rash" not in index.calls[1][0]
 
 
