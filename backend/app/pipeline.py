@@ -13,6 +13,7 @@ from typing import Any, Iterator, Optional
 from . import config
 from .agent import explainer
 from .conditions import CONDITIONS, CONTENT_TYPES, condition_name
+from .protocols import prescriber
 from .rag import retriever
 from .schemas import (
     AnswerPayload,
@@ -288,6 +289,19 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
         retrieval_failed = True
         yield note("Guideline search failed; showing the scoring result only.")
 
+    # fixed test protocol (ICMR/MoHFW document; offline, no retrieval, no LLM)
+    protocol = None
+    if config.TESTS_FROM_PROTOCOL:
+        try:
+            protocol = prescriber.prescribe(
+                s.posterior, s.shortlist, day=prescriber.parse_day_of_fever(s.initial_text))
+            if protocol["close"]:
+                yield note("The leading conditions are close; adding the tests that tell them apart.")
+            else:
+                yield note("Added the recommended tests from the ICMR/MoHFW test protocol.")
+        except Exception:
+            log.exception("test protocol failed")
+
     # cited summary (failure here must not lose the scoring result either)
     explanation: Optional[list[DiseaseExplanation]] = None
     if sources:
@@ -301,6 +315,12 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
         except Exception:
             log.exception("explanation failed")
             yield note("Could not write the summary; showing the scoring result and sources only.")
+
+    if protocol and protocol["by_condition"]:
+        try:
+            explanation, evidence = _merge_protocol(explanation, evidence, protocol, s)
+        except Exception:
+            log.exception("merging test protocol failed")
 
     s.explanation = [e.model_dump(by_alias=True, mode="json") for e in explanation] if explanation else None
     s.evidence = evidence.model_dump(by_alias=True, mode="json") if evidence else None
@@ -318,6 +338,49 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
             evidence=evidence,
         ),
     )
+
+
+def _merge_protocol(explanation, evidence, protocol, s):
+    """Put the fixed protocol's tests into each condition's confirmatory_tests section, with citations."""
+    docs = prescriber.load()["sources"]
+    sources = list(evidence.sources) if evidence else []
+    next_id = max((x.id for x in sources), default=0) + 1
+    made: dict = {}
+    existing = {e.disease_id: e for e in (explanation or [])}
+    merged = []
+    for cid in s.shortlist:
+        item = protocol["by_condition"].get(cid)
+        entry = existing.get(cid)
+        if item:
+            cites = []
+            for sid, loc in item["citations"]:
+                key = (sid, loc, cid)
+                if key not in made:
+                    d = docs[sid]
+                    f = d.get("kb_file")
+                    if f and not (config.KB_DOCS_DIR / f).exists():
+                        f = None
+                    sources.append(Source(
+                        id=next_id, title=f"{d['title']} ({d['issuer']}, {d['year']})", location=loc,
+                        body=d["issuer"] if d["issuer"] in ("ICMR", "MoHFW") else None,
+                        disease=condition_name(cid), content_type="confirmatory_tests",
+                        file=f, url=f"/kb-docs/{f}" if f else None, snippet=None))
+                    made[key] = next_id
+                    next_id += 1
+                cites.append(made[key])
+            secs = [x for x in (entry.sections if entry else []) if x.content_type != "confirmatory_tests"]
+            secs.append(ExplanationSection(content_type="confirmatory_tests", text=item["text"], citations=cites))
+            order = list(CONTENT_TYPES)
+            secs.sort(key=lambda x: order.index(x.content_type))
+            entry = DiseaseExplanation(disease_id=cid, disease=condition_name(cid), sections=secs)
+        if entry:
+            merged.append(entry)
+    if evidence:
+        evidence = evidence.model_copy(update={"sources": sources, "source_count": len(sources)})
+    else:
+        evidence = EvidenceData(source_count=len(sources), chunk_count=0, retrieval_ms=0,
+                                documents_in_index=0, sources=sources)
+    return merged, evidence
 
 
 def _build_sources(passages: list[dict]) -> list[Source]:
@@ -393,7 +456,12 @@ def _final_reply(s: Session, stop: str, has_expl: bool, retrieval_failed: bool, 
     names = [f"**{condition_name(c)}** ({_fmt_pct(p)})" for c, p in ranked]
     joined = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
     lines = [f"{STOP_TEXT[stop]} The most likely conditions are {joined}."]
-    if has_expl:
+    if has_expl and retrieval_failed:
+        lines.append(
+            "I couldn't search the guidelines this time, so only the recommended tests from the fixed "
+            "ICMR/MoHFW test protocol are shown. You can download it as a PDF."
+        )
+    elif has_expl:
         lines.append(
             "The summary below is taken from the clinical guidelines and includes the tests "
             "recommended to confirm each condition. You can download it as a PDF."

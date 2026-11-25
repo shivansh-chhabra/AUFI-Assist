@@ -89,7 +89,12 @@ def test_full_flow_stops_on_confidence_then_rag(mp):
     # uncited and badly-cited sections were removed, cited ones kept
     secs = r.explanation[0].sections
     assert [x.content_type for x in secs] == ["clinical_features", "confirmatory_tests"]
-    assert r.evidence.source_count == 2 and r.evidence.sources[0].id == 1
+    assert r.evidence.sources[0].id == 1
+    # retrieved sources first, then the protocol's; the tests section cites only the protocol's
+    n_rag = sum(1 for x in r.evidence.sources if x.id <= 2)
+    assert n_rag == 2 and r.evidence.source_count > 2
+    tests = secs[-1]
+    assert tests.citations and min(tests.citations) > 2
     assert r.evidence.sources[0].disease == "Dengue"
     assert any("without a valid citation" in x for x in r.steps)
     assert s.finished
@@ -139,8 +144,12 @@ def test_rag_down_keeps_scoring_result(mp):
     s = Session(id="t"); r = drive(s, "fever")
     while r.question:
         r = answer_yes(s, r)
-    assert s.finished and r.explanation is None and r.candidates[0].shortlisted
-    assert "couldn't search" in r.reply
+    assert s.finished and r.candidates[0].shortlisted
+    # the fixed protocol still supplies the tests, each with citations that resolve to listed sources
+    assert [x.content_type for x in r.explanation[0].sections] == ["confirmatory_tests"]
+    ids = {x.id for x in r.evidence.sources}
+    assert r.explanation[0].sections[0].citations and set(r.explanation[0].sections[0].citations) <= ids
+    assert "couldn't search" in r.reply and "test protocol" in r.reply
 
 
 def test_stubs_not_installed_gives_clear_message_and_is_retryable(mp):
