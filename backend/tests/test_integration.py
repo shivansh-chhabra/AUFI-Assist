@@ -133,3 +133,24 @@ def test_stub_flag_follows_index_dir(monkeypatch, tmp_path):
     (tmp_path / "there").mkdir()
     monkeypatch.setattr(config, "CHROMA_DIR", tmp_path / "there")
     assert retriever.STUB is False
+
+
+def test_answer_passages_filters_by_condition_and_floor(index):
+    out = retriever.answer_passages("how does it spread", "dengue")
+    assert len(out) == 1 and out[0]["disease"] == "dengue" and out[0]["file"] == "icmr_dengue.pdf"   # the 0.1 hit is below the floor
+    assert "Dengue:" in index.calls[-1][0] and retriever.answer_passages("", "dengue") == []
+
+
+def test_answer_question_uses_llm_when_grounded_else_quotes_the_guideline(llm):
+    ps = [{"id": 1, "text": "Dengue is spread by Aedes mosquitoes that bite during the day.", "title": "t", "location": "p. 1"},
+          {"id": 2, "text": "Rest and plenty of fluids are advised.", "title": "t", "location": "p. 2"}]
+    llm(reply={"answer": "It is spread by Aedes mosquitoes that bite in the day.", "citations": [1]})
+    assert explainer.answer_question("how", "Dengue", ps) == [
+        {"text": "It is spread by Aedes mosquitoes that bite in the day.", "citations": [1]}]
+    llm(reply={"answer": "It is spread by 5 kinds of fleas.", "citations": [1]})          # invented number and words
+    got = explainer.answer_question("how", "Dengue", ps)
+    assert [b["citations"] for b in got] == [[1], [2]] and got[0]["text"].startswith("Dengue is spread")
+    llm(reply={"answer": "", "citations": []})                                              # model says not covered
+    assert explainer.answer_question("how", "Dengue", ps) == []
+    llm(up=False)                                                                           # no LLM: quoted text
+    assert len(explainer.answer_question("how", "Dengue", ps)) == 2

@@ -8,14 +8,11 @@ const MIN_WIDTH = 220;
 const MAX_WIDTH = 420;
 
 interface SidebarProps {
-  workspace: string;
   conversations: Conversation[];
   activeConversationId: string;
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
   onDeleteConversation: (id: string) => void;
-  documentCount: number;
-  lastIndexed: string;
   width: number;
   onWidthChange: (width: number) => void;
   onGoHome?: () => void;
@@ -23,14 +20,11 @@ interface SidebarProps {
 }
 
 export default function Sidebar({
-  workspace,
   conversations,
   activeConversationId,
   onSelectConversation,
   onNewConversation,
   onDeleteConversation,
-  documentCount,
-  lastIndexed,
   width,
   onWidthChange,
   onGoHome,
@@ -65,15 +59,11 @@ export default function Sidebar({
           <span className="mark" />
           {BRAND_NAME}
         </button>
-        <div className="crumb">
-          Setting <b>{workspace}</b>
-        </div>
       </div>
 
       <button className="search-trigger search-trigger--sidebar" onClick={onOpenSearch} aria-label="Search the guidelines">
         <IconSearch />
         <span>Search guidelines</span>
-        <span className="search-trigger__kbd">⌘K</span>
       </button>
 
       <button className="new-chat-btn" onClick={onNewConversation}>
@@ -102,19 +92,6 @@ export default function Sidebar({
             </button>
           </div>
         ))}
-      </div>
-
-      <div className="side-section">
-        <div className="side-heading">Guideline corpus</div>
-        <div className="kb-stat">
-          <span className="kb-num">{documentCount}</span>
-          <span className="kb-lbl">guideline documents indexed</span>
-        </div>
-        <div className="kb-meta">
-          From <b>ICMR</b> and <b>MoHFW</b>
-          <br />
-          Last indexed <b>{lastIndexed}</b>
-        </div>
       </div>
 
       <div className="side-section">

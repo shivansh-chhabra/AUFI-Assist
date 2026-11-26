@@ -41,6 +41,9 @@ LLM_CHUNK_CHARS = int(os.getenv("AUFI_LLM_CHUNK_CHARS", "1000"))
 # --- scoring table (P(feature | condition) CSV read by scoring/diagnose.py) ------
 SCORING_TABLE = Path(os.getenv("AUFI_SCORING_TABLE", BACKEND_DIR / "data" / "scoring_table.csv"))
 
+# --- fixed per-condition summaries (app/summaries.py) -----------------------------
+DISEASE_SUMMARIES = Path(os.getenv("AUFI_DISEASE_SUMMARIES", BACKEND_DIR / "data" / "disease_summaries.json"))
+
 # --- fixed test protocol (app/protocols) -----------------------------------------
 # When on, recommended tests come from the fixed ICMR/MoHFW document, not from retrieval.
 TESTS_FROM_PROTOCOL = os.getenv("AUFI_TESTS_FROM_PROTOCOL", "1") not in ("0", "false", "False")

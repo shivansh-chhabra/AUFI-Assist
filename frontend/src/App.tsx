@@ -5,11 +5,10 @@ import ChatThread from './components/ChatThread';
 import Composer from './components/Composer';
 import SearchOverlay from './components/SearchOverlay';
 import { useTheme } from './hooks/useTheme';
-import { fetchConversationHistory, fetchConversations, fetchKnowledgeBaseStatus, goBack, sendMessageStream } from './api/client';
+import { fetchConversationHistory, fetchConversations, goBack, sendMessageStream } from './api/client';
 import { deriveCase } from './utils/caseState';
-import { WORKSPACE } from './brand';
 import { API_URL, USE_MOCK_DATA } from './config';
-import type { AnswerOption, AnswerPayload, ChatMessage, Conversation, FollowUpQuestion, KnowledgeBaseStatus } from './types';
+import type { AnswerOption, AnswerPayload, ChatMessage, Conversation, FollowUpQuestion } from './types';
 
 let messageIdCounter = 0;
 const nextId = () => `m${++messageIdCounter}`;
@@ -38,10 +37,6 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
   const { theme, toggleTheme } = useTheme();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string>('');
-  const [kbStatus, setKbStatus] = useState<KnowledgeBaseStatus>({
-    documentCount: 0,
-    lastIndexed: 'Not indexed yet',
-  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [liveSteps, setLiveSteps] = useState<string[]>([]);
@@ -84,16 +79,10 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
         setActiveConversationId(first.id);
       }
     });
-    fetchKnowledgeBaseStatus().then(setKbStatus);
-    // Knowledge-base status can change as documents are indexed in the
-    // background; refresh it periodically instead of only once on load.
-    const interval = setInterval(() => {
-      fetchKnowledgeBaseStatus().then(setKbStatus);
-    }, 30000);
-    return () => clearInterval(interval);
   }, []);
 
-  const { awaitingAnswer, inCase, progress } = deriveCase(messages);
+  const { awaitingAnswer, inCase, finished, progress } = deriveCase(messages);
+  const showComposer = !inCase || (!awaitingAnswer && !isLoading);
   const canGoBack = !USE_MOCK_DATA && !isLoading && awaitingAnswer && (progress?.questionsAsked ?? 0) > 0;
 
   const handleSend = async (text: string, answer?: AnswerPayload) => {
@@ -208,14 +197,11 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
   return (
     <div className="app" style={isDesktop ? { gridTemplateColumns: `${sidebarWidth}px 1fr` } : undefined}>
       <Sidebar
-        workspace={WORKSPACE}
         conversations={conversations}
         activeConversationId={activeConversationId}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         onDeleteConversation={handleDeleteConversation}
-        documentCount={kbStatus.documentCount}
-        lastIndexed={kbStatus.lastIndexed}
         width={sidebarWidth}
         onWidthChange={setSidebarWidth}
         onGoHome={onGoHome}
@@ -239,12 +225,14 @@ export default function App({ onGoHome }: { onGoHome?: () => void }) {
               : `${API_URL}/report/${encodeURIComponent(activeConversationId)}/pdf`
           }
         />
-        <Composer
-          onSend={(text) => handleSend(text)}
-          disabled={isLoading}
-          awaitingAnswer={awaitingAnswer}
-          compact={inCase}
-        />
+        {/* During the questionnaire the patient only taps the choices, so there is no text box. */}
+        {showComposer && (
+          <Composer
+            onSend={(text) => handleSend(text)}
+            disabled={isLoading}
+            placeholder={finished ? 'Ask any questions' : 'Describe the fever and any other symptoms…'}
+          />
+        )}
       </div>
 
       {isSearchOpen && <SearchOverlay onClose={() => setIsSearchOpen(false)} />}

@@ -84,9 +84,19 @@ export interface ExplanationSection {
   citations: number[];
 }
 
+/** The fixed, hand-written summary of one condition. */
+export interface DiseaseInfo {
+  causativeAgent: string;
+  transmission: string;
+  summary: string;
+  preventiveMethods: string[];
+}
+
 export interface DiseaseExplanation {
   diseaseId: string;
   disease: string;
+  /** Fixed summary. Present for every condition; `sections` only carries the recommended tests. */
+  info?: DiseaseInfo | null;
   sections: ExplanationSection[];
 }
 

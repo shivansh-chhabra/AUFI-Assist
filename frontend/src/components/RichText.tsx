@@ -1,15 +1,26 @@
 import type { ReactNode } from 'react';
 
-/** Bold for **text**; nothing else. */
-function inline(line: string): ReactNode[] {
-  return line.split(/\*\*(.+?)\*\*/g).map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part));
+/** Bold for **text**, and [n] markers as small clickable numbers when onCite is given. */
+function inline(line: string, onCite?: (n: number) => void): ReactNode[] {
+  return line.split(/(\*\*.+?\*\*|\[\d+\])/g).map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) return <strong key={i}>{part.slice(2, -2)}</strong>;
+    const m = /^\[(\d+)\]$/.exec(part);
+    if (m && onCite) {
+      return (
+        <button key={i} className="cite" type="button" onClick={() => onCite(Number(m[1]))} aria-label={`Open source ${m[1]}`}>
+          {m[1]}
+        </button>
+      );
+    }
+    return part;
+  });
 }
 
 /**
  * Renders the small amount of formatting the backend uses in summaries:
  * "**bold**" and lines starting with "- " as bullets. Anything else is plain paragraphs.
  */
-export default function RichText({ text }: { text: string }) {
+export default function RichText({ text, onCite }: { text: string; onCite?: (n: number) => void }) {
   const blocks: ReactNode[] = [];
   let items: string[] = [];
 
@@ -20,7 +31,7 @@ export default function RichText({ text }: { text: string }) {
     blocks.push(
       <ul className="rich-list" key={`l${blocks.length}`}>
         {list.map((it, i) => (
-          <li key={i}>{inline(it)}</li>
+          <li key={i}>{inline(it, onCite)}</li>
         ))}
       </ul>
     );
@@ -36,7 +47,7 @@ export default function RichText({ text }: { text: string }) {
       flush();
       blocks.push(
         <p className="rich-p" key={`p${blocks.length}`}>
-          {inline(line)}
+          {inline(line, onCite)}
         </p>
       );
     }

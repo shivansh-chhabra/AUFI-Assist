@@ -33,11 +33,10 @@ export default function EvidencePanel({ evidence, explanation, onOpenSource }: E
         <details className="src-drop">
           <summary className="src-drop__summary">
             <span className="chev">▶</span>
-            <span className="src-drop__title">Sources behind this summary</span>
+            <span className="src-drop__title">Sources behind the recommended tests</span>
             <span className="src-drop__count">
               {docs.length} {docs.length === 1 ? 'guideline' : 'guidelines'}
             </span>
-            <span className="state-badge verified">ICMR and MoHFW</span>
           </summary>
           <div className="src-drop__body">
             <p className="src-drop__note">
@@ -76,6 +75,7 @@ export default function EvidencePanel({ evidence, explanation, onOpenSource }: E
             <span className="chev">▶</span> How these were found
           </summary>
           <div className="why-content">
+            {chunkCount > 0 && (<>
             <div className="why-row">
               <b>Searched</b>
               <span>
@@ -91,6 +91,7 @@ export default function EvidencePanel({ evidence, explanation, onOpenSource }: E
                 {droppedBelowThreshold ? `, ${droppedBelowThreshold} dropped` : ''}
               </span>
             </div>
+            </>)}
             <div className="why-row">
               <b>Recommended tests</b>
               <span>Taken from the fixed ICMR and MoHFW test protocol, not searched.</span>

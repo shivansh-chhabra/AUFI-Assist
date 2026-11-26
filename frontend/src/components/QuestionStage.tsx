@@ -90,10 +90,6 @@ export default function QuestionStage({
 
   return (
     <div className="stage">
-      <div className="stage-aurora" aria-hidden="true">
-        <span /><span /><span />
-      </div>
-
       <div className="stage-top">
         <button
           className="stage-back"
@@ -157,7 +153,7 @@ export default function QuestionStage({
                 ))}
               </div>
               <motion.p className="stage-hint" variants={rise}>
-                Press 1, 2 or 3 to choose. You can also answer in your own words below.
+                Press 1, 2 or 3 to choose.
               </motion.p>
             </motion.div>
           )}

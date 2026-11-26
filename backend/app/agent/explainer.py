@@ -154,6 +154,47 @@ def _llm_sections(name: str, findings, initial_text, plist) -> list[dict]:
     return out
 
 
+# ---------------------------------------------------------------- patient questions
+ANSWER_SYSTEM = """You answer a patient's question about one condition using numbered excerpts from Indian clinical guidelines.
+
+Reply with exactly one JSON object and nothing else:
+{"answer": "<2 to 5 short sentences in plain language>", "citations": [<excerpt numbers>]}
+
+Rules:
+- Use ONLY what the excerpts say. Do not add facts, numbers, drug names or doses that are not in them.
+- If the excerpts do not answer the question, reply {"answer": "", "citations": []}.
+- Cite the excerpt numbers the answer is based on. Cite only numbers you were given.
+- Do not tell the person they have the condition."""
+
+
+def answer_question(question: str, name: str, plist: list[dict]) -> list[dict]:
+    """Blocks [{"text", "citations": [passage ids]}] that answer the question from the passages only.
+    [] means the passages do not answer it. Falls back to quoted guideline text if the LLM is off."""
+    if not plist:
+        return []
+    by_id = {int(p["id"]): p for p in plist}
+    llm = _llm_client()
+    if llm.available():
+        try:
+            lines = [f"CONDITION: {name}", f"QUESTION: {_clean(question)[:400]}", "", "EXCERPTS:"]
+            lines += [f"[{p['id']}] ({p.get('title') or 'guideline'}, {p.get('location') or ''}) "
+                      + _clean(p["text"])[: config.LLM_CHUNK_CHARS] for p in plist]
+            obj = parse_json(llm.chat([{"role": "system", "content": ANSWER_SYSTEM},
+                                       {"role": "user", "content": "\n".join(lines)}]))
+            if obj is not None:
+                text = _clean(obj.get("answer"))
+                if not text:
+                    return []             # the model says the excerpts do not cover it
+                cites = sorted({int(c) for c in obj.get("citations") or [] if int(c) in by_id})
+                if cites and len(text) <= 900 and grounded(text, [by_id[c]["text"] for c in cites], 0.5):
+                    return [{"text": text, "citations": cites}]
+                log.info("dropped ungrounded answer for %s", name)
+        except (OSError, ValueError, TypeError) as e:
+            log.warning("answer LLM failed: %s", e)
+            llm._ok = False
+    return [{"text": extractive(p["text"], 380), "citations": [int(p["id"])]} for p in plist[:2]]
+
+
 # ---------------------------------------------------------------- main entry
 def _match(passage_disease, cid: str) -> bool:
     """Pipeline passes the display name; accept the id too."""
