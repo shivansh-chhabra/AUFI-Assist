@@ -1,0 +1,160 @@
+{
+  "cluster": "AUFI (Acute Undifferentiated Febrile Illness)",
+  "disclaimer": "General educational summaries for a project prototype. Not medical advice. Cross-check against the ICMR/MoHFW guideline corpus before displaying to users.",
+  "diseases": [
+    {
+      "id": "malaria",
+      "name": "Malaria (P. vivax / P. falciparum)",
+      "causative_agent": "Plasmodium parasites",
+      "transmission": "Bite of an infected female Anopheles mosquito",
+      "summary": "A parasitic infection of red blood cells causing fever with chills and rigors, headache and body ache. P. falciparum can progress quickly to severe disease (cerebral malaria, severe anaemia, organ failure). P. vivax is usually milder but can relapse weeks to months later because of dormant liver stages.",
+      "preventive_methods": [
+        "Sleep under insecticide-treated bed nets",
+        "Indoor residual spraying in endemic areas",
+        "Use mosquito repellents, screens and long-sleeved clothing, especially at dusk and night",
+        "Eliminate stagnant water where Anopheles breed (larval source management)",
+        "Get tested early when fever occurs in endemic areas and complete the full course of treatment",
+        "Doctor-advised chemoprophylaxis for travellers to high-risk areas"
+      ]
+    },
+    {
+      "id": "dengue",
+      "name": "Dengue (including dengue haemorrhagic fever)",
+      "causative_agent": "Dengue virus (serotypes DENV-1 to 4)",
+      "transmission": "Bite of infected Aedes mosquitoes (mainly Aedes aegypti), which bite in the daytime",
+      "summary": "A viral fever with high temperature, severe headache, pain behind the eyes, muscle and joint pain and rash. A minority progress to severe dengue (plasma leakage, bleeding, shock), usually around the time the fever settles. A later infection with a different serotype carries higher risk of severe disease.",
+      "preventive_methods": [
+        "Remove or cover water-holding containers (coolers, tyres, buckets, plant trays); empty and scrub weekly",
+        "Use repellents, long clothing and window/door screens during the day",
+        "Community vector control (fogging, larvicide) run by local health authorities",
+        "Seek care early if warning signs appear (persistent vomiting, abdominal pain, bleeding)",
+        "Vaccines exist in some countries with eligibility restrictions; check current availability and recommendations locally"
+      ]
+    },
+    {
+      "id": "typhoid",
+      "name": "Typhoid (enteric) fever",
+      "causative_agent": "Salmonella Typhi (and Salmonella Paratyphi A for paratyphoid)",
+      "transmission": "Faecal-oral route through contaminated food and water",
+      "summary": "A systemic bacterial infection causing prolonged, gradually rising fever, headache, abdominal discomfort, and constipation or diarrhoea. Untreated, it can cause complications such as intestinal bleeding or perforation. Some recovered people become long-term carriers.",
+      "preventive_methods": [
+        "Drink safe (boiled, filtered or treated) water and avoid ice of unknown source",
+        "Wash hands with soap before eating and after using the toilet",
+        "Eat freshly cooked food; avoid raw or street food of doubtful hygiene",
+        "Improve sanitation and safe sewage disposal",
+        "Typhoid conjugate vaccine (TCV) for at-risk groups per national guidance"
+      ]
+    },
+    {
+      "id": "scrub_murine_typhus",
+      "name": "Scrub typhus / Murine typhus",
+      "causative_agent": "Orientia tsutsugamushi (scrub typhus); Rickettsia typhi (murine typhus)",
+      "transmission": "Scrub typhus: bite of infected chigger (larval mite) larvae. Murine typhus: infected rat fleas",
+      "summary": "Rickettsial fevers causing fever, headache, myalgia and sometimes rash. Scrub typhus may show a black scab-like eschar at the bite site (not present in all patients) and can progress to pneumonia, meningoencephalitis or multi-organ failure if untreated. Both respond to appropriate antibiotics when started early.",
+      "preventive_methods": [
+        "Avoid or limit contact with scrub vegetation and grassy or bushy areas; do not sit directly on the ground there",
+        "Wear long sleeves and trousers tucked into socks; use repellents (permethrin-treated clothing where available)",
+        "Wash and dry clothes and bathe after outdoor exposure",
+        "Rodent control and keeping surroundings clean (murine typhus)",
+        "Flea control on pets and in homes",
+        "No licensed vaccine is available"
+      ]
+    },
+    {
+      "id": "leptospirosis",
+      "name": "Leptospirosis",
+      "causative_agent": "Leptospira bacteria",
+      "transmission": "Contact of broken skin or mucous membranes with water, soil or mud contaminated by urine of infected animals (rats, cattle, dogs, etc.); outbreaks often follow floods",
+      "summary": "A bacterial zoonosis ranging from a flu-like illness with fever, myalgia and conjunctival redness to severe disease (Weil's disease) with jaundice, kidney failure and bleeding, including lung haemorrhage.",
+      "preventive_methods": [
+        "Avoid wading or swimming in floodwater or stagnant water",
+        "Wear boots and gloves in high-risk work (farming, sewage, animal handling) and cover cuts",
+        "Rodent control and safe food and waste storage",
+        "Wash and disinfect after exposure; use safe drinking water",
+        "Doctor-advised antibiotic prophylaxis for selected high-risk exposures"
+      ]
+    },
+    {
+      "id": "chikungunya",
+      "name": "Chikungunya",
+      "causative_agent": "Chikungunya virus (an alphavirus)",
+      "transmission": "Bite of infected Aedes aegypti or Aedes albopictus mosquitoes",
+      "summary": "A viral fever with abrupt high temperature and severe, often symmetrical joint pain, plus rash and headache. The joint pain can persist for weeks to months in some patients. Deaths are uncommon, but it can be severe in newborns, older adults and people with other illnesses.",
+      "preventive_methods": [
+        "Same vector control as dengue: remove standing water, cover containers, use screens",
+        "Repellents and protective clothing, especially during the day",
+        "Protect infected people from further mosquito bites during the first week of illness to avoid onward spread",
+        "Vaccines have been licensed in some countries; availability and safety guidance have been evolving, so verify the current status"
+      ]
+    },
+    {
+      "id": "viral_ili",
+      "name": "Viral influenza-like illness (ILI)",
+      "causative_agent": "Influenza viruses and other respiratory viruses",
+      "transmission": "Respiratory droplets and aerosols, and contact with contaminated surfaces",
+      "summary": "An acute respiratory viral illness with fever, cough, sore throat, body aches and fatigue. Usually self-limiting, but can become severe in older adults, young children, pregnant women and people with chronic conditions.",
+      "preventive_methods": [
+        "Annual influenza vaccination, particularly for high-risk groups",
+        "Frequent handwashing and cough/sneeze etiquette",
+        "Stay home when ill; wear a mask around others and in crowded or high-risk settings",
+        "Good ventilation of indoor spaces",
+        "Avoid close contact with people who have flu-like symptoms"
+      ]
+    },
+    {
+      "id": "hepatitis_a_e",
+      "name": "Hepatitis A / Hepatitis E",
+      "causative_agent": "Hepatitis A virus (HAV) and Hepatitis E virus (HEV)",
+      "transmission": "Faecal-oral route, mainly via contaminated water and food",
+      "summary": "Acute viral liver infections causing fever, fatigue, nausea, loss of appetite, dark urine and jaundice. They are generally self-limiting and do not become chronic in healthy people. HEV can be particularly dangerous in pregnancy.",
+      "preventive_methods": [
+        "Drink safe water and eat properly washed or cooked food",
+        "Handwashing with soap after toilet use and before handling food",
+        "Improved sanitation and safe sewage disposal",
+        "Hepatitis A vaccine is available and recommended in many settings",
+        "HEV vaccine access is limited to a few countries; check current availability"
+      ]
+    },
+    {
+      "id": "occult_bacteremia",
+      "name": "Occult bacteremia (pneumonia / UTI-pyelonephritis / intra-abdominal source)",
+      "causative_agent": "Various bacteria (for example Streptococcus pneumoniae, E. coli and other Gram-negatives)",
+      "transmission": "Not a single disease: bacteria enter the bloodstream from a primary focus such as the lungs, urinary tract or abdomen, and the source may not be obvious at first",
+      "summary": "A bloodstream bacterial infection that presents as fever with few localising signs. The cluster entry groups hidden-source infections such as pneumonia, UTI/pyelonephritis and intra-abdominal infection. Delay in recognition can lead to sepsis.",
+      "preventive_methods": [
+        "Keep vaccinations up to date (pneumococcal, Hib and others per schedule)",
+        "Treat urinary, respiratory and abdominal infections early and completely",
+        "Maintain hydration and good catheter and wound care",
+        "Seek prompt medical evaluation for persistent fever without a clear cause",
+        "Manage underlying conditions such as diabetes"
+      ]
+    },
+    {
+      "id": "rheumatic_fever",
+      "name": "Acute rheumatic fever",
+      "causative_agent": "Immune reaction following Group A Streptococcus (S. pyogenes) throat infection",
+      "transmission": "Not directly contagious: it follows untreated or inadequately treated strep pharyngitis, which spreads by respiratory droplets",
+      "summary": "An autoimmune inflammatory disease occurring typically 2 to 4 weeks after strep throat, mainly in children and young people. It can affect the heart, joints, brain (chorea) and skin, and repeated episodes can cause permanent rheumatic heart disease.",
+      "preventive_methods": [
+        "Primary prevention: timely diagnosis and full antibiotic treatment (usually penicillin) of strep sore throat",
+        "Secondary prevention: long-term penicillin prophylaxis (commonly benzathine penicillin injections) after an episode",
+        "Reduce overcrowding and improve housing and hygiene",
+        "Regular follow-up and cardiac screening for people with a history"
+      ]
+    },
+    {
+      "id": "tb",
+      "name": "Tuberculosis (prolonged fever presentation)",
+      "causative_agent": "Mycobacterium tuberculosis",
+      "transmission": "Airborne, through droplet nuclei from people with active pulmonary TB",
+      "summary": "A chronic bacterial infection that most often affects the lungs but can involve any organ. It typically presents with fever lasting more than two to three weeks, cough, weight loss and night sweats. Curable with a full course of anti-TB therapy; incomplete treatment risks drug resistance.",
+      "preventive_methods": [
+        "Early diagnosis and complete treatment of active cases to cut transmission",
+        "BCG vaccination in infancy (protects mainly against severe childhood forms)",
+        "Good ventilation, cough etiquette and masks near infectious patients",
+        "Contact tracing and TB preventive treatment for eligible contacts",
+        "Address risk factors such as undernutrition, HIV, diabetes, smoking and alcohol use"
+      ]
+    }
+  ]
+}

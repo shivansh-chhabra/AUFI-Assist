@@ -72,8 +72,11 @@ def mp(monkeypatch):
     return monkeypatch
 
 
-def test_full_flow_stops_on_confidence_then_rag(mp):
-    FakeScorer().install(mp); fake_rag(mp); fake_agent(mp)
+def test_full_flow_stops_on_confidence_then_fixed_summaries(mp):
+    FakeScorer().install(mp)
+    # the final stage no longer retrieves or calls the LLM: make either one blow up if it is touched
+    boom = lambda *a, **k: (_ for _ in ()).throw(AssertionError("RAG/LLM must not run for the summary"))
+    mp.setattr(retriever, "retrieve", boom); mp.setattr(explainer, "explain", boom)
     s = Session(id="t")
     r = drive(s, "fever for 3 days")
     assert r.question and r.progress.questions_asked == 0 and r.progress.max_questions == 12
@@ -86,17 +89,19 @@ def test_full_flow_stops_on_confidence_then_rag(mp):
     assert r.question is None
     assert [c.shortlisted for c in r.candidates[:3]] == [True, True, True]
     assert r.candidates[0].id == "dengue"
-    # uncited and badly-cited sections were removed, cited ones kept
-    secs = r.explanation[0].sections
-    assert [x.content_type for x in secs] == ["clinical_features", "confirmatory_tests"]
-    assert r.evidence.sources[0].id == 1
-    # retrieved sources first, then the protocol's; the tests section cites only the protocol's
-    n_rag = sum(1 for x in r.evidence.sources if x.id <= 2)
-    assert n_rag == 2 and r.evidence.source_count > 2
-    tests = secs[-1]
-    assert tests.citations and min(tests.citations) > 2
-    assert r.evidence.sources[0].disease == "Dengue"
-    assert any("without a valid citation" in x for x in r.steps)
+    # every condition has its fixed summary, most likely first
+    assert len(r.explanation) == 11 and r.explanation[0].disease_id == "dengue"
+    assert all(e.info and e.info.summary and e.info.preventive_methods for e in r.explanation)
+    assert "Aedes" in r.explanation[0].info.transmission
+    # only the shortlisted conditions carry tests, each cited to the protocol's sources
+    with_tests = [e for e in r.explanation if e.sections]
+    assert [e.disease_id for e in with_tests] == s.shortlist
+    ids = {x.id for x in r.evidence.sources}
+    for e in with_tests:
+        assert [x.content_type for x in e.sections] == ["confirmatory_tests"]
+        assert e.sections[0].citations and set(e.sections[0].citations) <= ids
+    assert r.evidence.sources[0].disease == "Dengue" and r.evidence.chunk_count == 0
+    assert "summary of each condition" in r.reply and "test protocol" in r.reply
     assert s.finished
 
 
@@ -138,18 +143,19 @@ def test_stale_button_payload_falls_back_to_the_typed_text(mp):
     assert r2.question.feature == "f1"
 
 
-def test_rag_down_keeps_scoring_result(mp):
-    FakeScorer().install(mp); fake_agent(mp)
-    mp.setattr(retriever, "retrieve", lambda sl, q: (_ for _ in ()).throw(RuntimeError("chroma down")))
+def test_summaries_missing_keeps_scoring_result_and_tests(mp):
+    FakeScorer().install(mp)
+    mp.setattr(pipeline.summaries, "get", lambda cid: (_ for _ in ()).throw(ValueError("bad json")))
     s = Session(id="t"); r = drive(s, "fever")
     while r.question:
         r = answer_yes(s, r)
     assert s.finished and r.candidates[0].shortlisted
     # the fixed protocol still supplies the tests, each with citations that resolve to listed sources
-    assert [x.content_type for x in r.explanation[0].sections] == ["confirmatory_tests"]
+    assert [e.disease_id for e in r.explanation] == s.shortlist
+    assert all(e.info is None for e in r.explanation)
     ids = {x.id for x in r.evidence.sources}
     assert r.explanation[0].sections[0].citations and set(r.explanation[0].sections[0].citations) <= ids
-    assert "couldn't search" in r.reply and "test protocol" in r.reply
+    assert "Only the recommended tests" in r.reply
 
 
 def test_stubs_not_installed_gives_clear_message_and_is_retryable(mp):
@@ -163,13 +169,61 @@ def test_stubs_not_installed_gives_clear_message_and_is_retryable(mp):
     assert s.started and r.question
 
 
-def test_finished_case_is_read_only(mp):
+def finish_case(mp):
     FakeScorer(step=0.5).install(mp); fake_rag(mp); fake_agent(mp)
     s = Session(id="t"); r = drive(s, "fever")
     while r.question:
         r = answer_yes(s, r)
-    again = drive(s, "hello?")
-    assert "complete" in again.reply and again.question is None
+    return s
+
+
+def fake_qa(mp, passages, blocks, seen=None):
+    def ap(question, cid, n=4):
+        if seen is not None:
+            seen.append((question, cid))
+        return [dict(p) for p in passages]
+    mp.setattr(pipeline.retriever, "answer_passages", ap)
+    mp.setattr(pipeline.explainer, "answer_question", lambda q, name, plist: blocks)
+
+
+P = [{"text": "Dengue is spread by Aedes mosquitoes.", "file": "dengue.pdf", "location": "p. 2", "title": "Dengue guideline", "body": "MoHFW", "disease": "dengue", "relevance": 0.7},
+     {"text": "Rest and plenty of fluids are advised.", "file": "dengue.pdf", "location": "p. 9", "title": "Dengue guideline", "body": "MoHFW", "disease": "dengue", "relevance": 0.6}]
+
+
+def test_question_after_result_is_answered_from_the_guidelines_with_citations(mp):
+    s = finish_case(mp)
+    seen = []
+    fake_qa(mp, P, [{"text": "It is spread by mosquitoes.", "citations": [2]}], seen)
+    r = drive(s, "How does it spread?")
+    assert seen and seen[0][1] == s.shortlist[0]                   # defaults to the leading condition
+    assert r.question is None and s.finished and r.progress.stop_reason
+    assert r.reply.startswith("It is spread by mosquitoes. [1]")   # cited passage 2 is renumbered to 1
+    assert [x.id for x in r.evidence.sources] == [1] and r.evidence.sources[0].location == "p. 9"
+
+
+def test_question_naming_another_condition_uses_that_condition(mp):
+    s = finish_case(mp)
+    seen = []
+    fake_qa(mp, P, [{"text": "x", "citations": [1]}], seen)
+    drive(s, "What are the symptoms of malaria?")
+    assert seen[0][1] == "malaria"
+
+
+def test_unanswerable_question_says_so_and_does_not_guess(mp):
+    s = finish_case(mp)
+    fake_qa(mp, P, [])
+    r = drive(s, "Can I drive a car?")
+    assert "won't guess" in r.reply and r.evidence is None
+    fake_qa(mp, [], [{"text": "x", "citations": [1]}])             # nothing retrieved at all
+    assert "won't guess" in drive(s, "Anything?").reply
+
+
+def test_qa_does_not_disturb_the_stored_result_used_for_the_pdf(mp):
+    s = finish_case(mp)
+    before = (s.explanation, s.evidence)
+    fake_qa(mp, P, [{"text": "x", "citations": [1]}])
+    drive(s, "What is it?")
+    assert (s.explanation, s.evidence) == before
 
 
 def test_pdf_builds(mp):
@@ -179,6 +233,7 @@ def test_pdf_builds(mp):
         r = answer_yes(s, r)
     pdf = build_pdf(s)
     assert pdf.startswith(b"%PDF") and len(pdf) > 2000
+    assert any(e["info"] for e in s.explanation)
     open("/tmp/aufi_test_report.pdf", "wb").write(pdf)
 
 

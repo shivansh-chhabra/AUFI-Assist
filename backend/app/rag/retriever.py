@@ -197,6 +197,24 @@ def search(query: str, disease: Optional[str] = None, content_type: Optional[str
     return out
 
 
+def answer_passages(question: str, cid: str, n: int = 4) -> list[dict]:
+    """Passages that may answer a patient's question about one condition, best first.
+    Same shape as retrieve() passages; below-floor passages are dropped."""
+    mid = _manifest_id(cid)
+    if mid is None or not (question or "").strip():
+        return []
+    q = f"{condition_name(cid)}: {' '.join(question.split())[:300]}"
+    out, seen = [], set()
+    for hit in _get().search(q, [mid], n=n):
+        if hit["score"] < config.RELEVANCE_FLOOR:
+            continue
+        k = _key(hit)
+        if k not in seen:
+            seen.add(k)
+            out.append(_passage(hit, cid, "clinical_features"))
+    return out
+
+
 def document_count() -> int:
     """Distinct guideline files in the index (sidebar counter)."""
     r = _get()

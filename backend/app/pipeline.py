@@ -1,4 +1,4 @@
-"""The case loop: questionnaire -> stop rule -> RAG -> cited summary.
+"""The case loop: questionnaire -> stop rule -> fixed summaries + fixed test protocol.
 
 `run_turn()` is a generator of ("step", text) events followed by one ("final", ChatResponse).
 The /chat/stream route forwards the events as SSE; /chat just drains it.
@@ -7,10 +7,9 @@ This module has no web-framework imports so it can be tested on its own.
 """
 import logging
 import re
-import time
 from typing import Any, Iterator, Optional
 
-from . import config
+from . import config, summaries
 from .agent import explainer
 from .conditions import CONDITIONS, CONTENT_TYPES, condition_name
 from .protocols import prescriber
@@ -21,8 +20,8 @@ from .schemas import (
     CaseProgress,
     ChatResponse,
     DiseaseExplanation,
+    DiseaseInfo,
     EvidenceData,
-    EvidenceFilter,
     ExplanationSection,
     FollowUpQuestion,
     Source,
@@ -153,6 +152,56 @@ def run_turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Itera
             yield ("final", resp)
 
 
+_MENTIONS = {
+    "malaria": r"malaria", "dengue": r"dengue", "typhoid": r"typhoid|enteric", "scrub_typhus": r"scrub|murine|rickett",
+    "leptospirosis": r"lepto", "chikungunya": r"chikun", "viral_ili": r"influenza|\bflu\b|swine", "hepatitis_a_e": r"hepatitis",
+    "occult_bacteraemia": r"bacter(a)?emia|sepsis", "rheumatic_fever": r"rheumatic", "tb": r"\btb\b|tubercul",
+}
+
+
+def _mentioned_condition(text: str) -> Optional[str]:
+    for cid, rx in _MENTIONS.items():
+        if re.search(rx, text, re.I):
+            return cid
+    return None
+
+
+def _answer_followup(s: Session, message: str, note, steps: list) -> Iterator[Event]:
+    """After the result: answer a question about the condition from the guideline index, with citations."""
+    def done(reply: str, **kw):
+        return ("final", _response(s, reply, steps, progress=_progress(s, len(s.shortlist)), **kw))
+
+    cid = _mentioned_condition(message) or (s.shortlist[0] if s.shortlist else None)
+    if cid is None:
+        yield done("I'm not sure which condition you mean. Please name it, for example \"What causes dengue?\".")
+        return
+    name = condition_name(cid)
+    yield note(f"Looking for an answer about {name} in the guidelines.")
+    try:
+        passages = retriever.answer_passages(message, cid, n=4)
+    except NotImplementedError:
+        raise
+    except Exception:
+        log.exception("answer retrieval failed")
+        yield done("I couldn't search the guidelines just now, so I can't answer that. Please try again, or ask your doctor.")
+        return
+    for i, p in enumerate(passages, start=1):
+        p["id"] = i
+    blocks = explainer.answer_question(message, name, passages) if passages else []
+    if not blocks:
+        yield done(f"I couldn't find an answer to that about {name} in the ICMR and MoHFW guidelines I have, "
+                   "so I won't guess. Please ask your doctor.")
+        return
+    used = sorted({c for b in blocks for c in b["citations"]})
+    renum = {old: new for new, old in enumerate(used, start=1)}
+    sources = _build_sources([passages[old - 1] for old in used])
+    reply = "\n\n".join(b["text"] + " " + "".join(f"[{renum[c]}]" for c in b["citations"]) for b in blocks)
+    evidence = EvidenceData(source_count=len(sources), chunk_count=len(passages), retrieval_ms=0,
+                            documents_in_index=0, sources=sources)
+    yield note(f"Answered from {len(sources)} guideline {'passage' if len(sources) == 1 else 'passages'}.")
+    yield done(reply, evidence=evidence)
+
+
 def undo_last(s: Session) -> ChatResponse:
     """Take back the last answer: rebuild the scoring state from the earlier answers and re-ask that question."""
     with s.lock:
@@ -201,13 +250,7 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
 
     # A finished case is read-only: start a new case for the next patient.
     if s.finished:
-        yield (
-            "final",
-            _response(
-                s, "This case is complete. To assess another patient, start a new case.", steps,
-                candidates=_candidates(s, s.shortlist), progress=_progress(s, len(s.shortlist)),
-            ),
-        )
+        yield from _answer_followup(s, message, note, steps)
         return
 
     if not s.started:
@@ -283,33 +326,6 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
     s.shortlist = [cid for cid, _ in ranked[: config.SHORTLIST_SIZE]]
     yield note(f"Questions finished. Shortlist: {', '.join(condition_name(c) for c in s.shortlist)}.")
 
-    # retrieval (failure here must not lose the scoring result)
-    sources: list[Source] = []
-    evidence: Optional[EvidenceData] = None
-    retrieval_failed = False
-    yield note("Searching the guideline documents for the shortlisted conditions.")
-    t0 = time.perf_counter()
-    try:
-        raw = retriever.retrieve(s.shortlist, _case_query(s))
-        sources = _build_sources(raw.get("passages", []))
-        evidence = EvidenceData(
-            source_count=len(sources),
-            chunk_count=int(raw.get("chunk_count", len(sources))),
-            retrieval_ms=round((time.perf_counter() - t0) * 1000),
-            documents_in_index=int(raw.get("documents_in_index", 0)),
-            sources=sources,
-            dropped_below_threshold=raw.get("dropped_below_threshold"),
-            filters=_build_filters(raw.get("filters")),
-        )
-        yield note(f"Found {len(sources)} guideline passage{'s' if len(sources) != 1 else ''}.")
-    except NotImplementedError:
-        retrieval_failed = True
-        yield note("Guideline search is not connected yet; showing the scoring result only.")
-    except Exception:
-        log.exception("retrieval failed")
-        retrieval_failed = True
-        yield note("Guideline search failed; showing the scoring result only.")
-
     # fixed test protocol (ICMR/MoHFW document; offline, no retrieval, no LLM)
     protocol = None
     if config.TESTS_FROM_PROTOCOL:
@@ -323,19 +339,15 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
         except Exception:
             log.exception("test protocol failed")
 
-    # cited summary (failure here must not lose the scoring result either)
+    # fixed summaries (hand-written, read from disk: instant, no retrieval, no LLM)
     explanation: Optional[list[DiseaseExplanation]] = None
-    if sources:
-        yield note("Writing the cited summary and recommended tests.")
-        try:
-            explanation, dropped = _explain(s, sources)
-            if dropped:
-                yield note(f"Removed {dropped} statement{'s' if dropped != 1 else ''} without a valid citation.")
-        except NotImplementedError:
-            yield note("The summary writer is not connected yet; showing the scoring result and sources only.")
-        except Exception:
-            log.exception("explanation failed")
-            yield note("Could not write the summary; showing the scoring result and sources only.")
+    evidence: Optional[EvidenceData] = None
+    try:
+        explanation = _summaries(s)
+        yield note("Added the summary of each condition.")
+    except Exception:
+        log.exception("condition summaries failed")
+        yield note("Could not load the condition summaries; showing the scoring result only.")
 
     if protocol and protocol["by_condition"]:
         try:
@@ -351,7 +363,8 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
         "final",
         _response(
             s,
-            _final_reply(s, stop, bool(explanation), retrieval_failed, bool(sources)),
+            _final_reply(s, stop, has_summary=bool(explanation and any(e.info for e in explanation)),
+                         has_tests=bool(evidence and evidence.sources)),
             steps,
             candidates=_candidates(s, s.shortlist),
             progress=_progress(s, len(s.shortlist)),
@@ -362,13 +375,14 @@ def _turn(s: Session, message: str, answer: Optional[AnswerPayload]) -> Iterator
 
 
 def _merge_protocol(explanation, evidence, protocol, s):
-    """Put the fixed protocol's tests into each condition's confirmatory_tests section, with citations."""
+    """Put the fixed protocol's tests into each shortlisted condition's confirmatory_tests section, with citations.
+    Conditions that are not shortlisted keep their summary and get no tests."""
     docs = prescriber.load()["sources"]
     sources = list(evidence.sources) if evidence else []
     next_id = max((x.id for x in sources), default=0) + 1
     made: dict = {}
     existing = {e.disease_id: e for e in (explanation or [])}
-    merged = []
+    replaced: dict = {}
     for cid in s.shortlist:
         item = protocol["by_condition"].get(cid)
         entry = existing.get(cid)
@@ -393,9 +407,10 @@ def _merge_protocol(explanation, evidence, protocol, s):
             secs.append(ExplanationSection(content_type="confirmatory_tests", text=item["text"], citations=cites))
             order = list(CONTENT_TYPES)
             secs.sort(key=lambda x: order.index(x.content_type))
-            entry = DiseaseExplanation(disease_id=cid, disease=condition_name(cid), sections=secs)
-        if entry:
-            merged.append(entry)
+            entry = DiseaseExplanation(disease_id=cid, disease=condition_name(cid),
+                                       info=entry.info if entry else None, sections=secs)
+            replaced[cid] = entry
+    merged = [replaced.pop(e.disease_id, e) for e in (explanation or [])] + list(replaced.values())
     if evidence:
         evidence = evidence.model_copy(update={"sources": sources, "source_count": len(sources)})
     else:
@@ -426,72 +441,30 @@ def _build_sources(passages: list[dict]) -> list[Source]:
     return out
 
 
-def _build_filters(raw: Optional[list[dict]]) -> Optional[list[EvidenceFilter]]:
-    if not raw:
-        return None
+def _summaries(s: Session) -> list[DiseaseExplanation]:
+    """The fixed summary of every condition, most likely first. Tests are added later for the shortlist."""
+    ranked = sorted(s.posterior, key=lambda c: s.posterior[c], reverse=True)
     return [
-        EvidenceFilter(disease=condition_name(f["disease"]), content_type=f["content_type"])
-        for f in raw
-        if f.get("content_type") in CONTENT_TYPES and f.get("disease")
+        DiseaseExplanation(disease_id=cid, disease=condition_name(cid), info=DiseaseInfo(**summaries.get(cid)))
+        for cid in ranked
     ]
 
 
-def _explain(s: Session, sources: list[Source]) -> tuple[Optional[list[DiseaseExplanation]], int]:
-    shortlist = [{"id": c, "name": condition_name(c), "probability": s.posterior[c]} for c in s.shortlist]
-    findings = [
-        {"feature": a["feature"], "question": a["text"], "answer": a["answer"]} for a in s.asked
-    ]
-    passages = [
-        {
-            "id": src.id, "text": src.snippet, "title": src.title, "location": src.location,
-            "body": src.body, "disease": src.disease, "content_type": src.content_type,
-        }
-        for src in sources
-    ]
-    raw = explainer.explain(shortlist, findings, s.initial_text, passages)
-
-    valid_ids = {src.id for src in sources}
-    dropped = 0
-    result: list[DiseaseExplanation] = []
-    for entry in raw or []:
-        cid = entry.get("disease_id")
-        if cid not in CONDITIONS:
-            continue
-        sections: list[ExplanationSection] = []
-        for sec in entry.get("sections", []):
-            text = (sec.get("text") or "").strip()
-            cites = [int(c) for c in sec.get("citations", []) if int(c) in valid_ids]
-            if sec.get("content_type") not in CONTENT_TYPES or not text:
-                continue
-            if not cites:  # the UI promises "every statement is cited"
-                dropped += 1
-                continue
-            sections.append(ExplanationSection(content_type=sec["content_type"], text=text, citations=cites))
-        if sections:
-            result.append(DiseaseExplanation(disease_id=cid, disease=condition_name(cid), sections=sections))
-    return (result or None), dropped
-
-
-def _final_reply(s: Session, stop: str, has_expl: bool, retrieval_failed: bool, has_sources: bool) -> str:
+def _final_reply(s: Session, stop: str, has_summary: bool, has_tests: bool) -> str:
     ranked = sorted(s.posterior.items(), key=lambda kv: kv[1], reverse=True)[: config.SHORTLIST_SIZE]
     names = [f"**{condition_name(c)}** ({_fmt_pct(p)})" for c, p in ranked]
     joined = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
     lines = [f"{STOP_TEXT[stop]} The most likely conditions are {joined}."]
-    if has_expl and retrieval_failed:
+    if has_summary and has_tests:
         lines.append(
-            "I couldn't search the guidelines this time, so only the recommended tests from the fixed "
-            "ICMR/MoHFW test protocol are shown. You can download it as a PDF."
+            "Below is a short summary of each condition and the tests recommended to confirm the likely "
+            "ones, from the ICMR/MoHFW test protocol. You can download it as a PDF."
         )
-    elif has_expl:
-        lines.append(
-            "The summary below is taken from the clinical guidelines and includes the tests "
-            "recommended to confirm each condition. You can download it as a PDF."
-        )
-    elif retrieval_failed:
-        lines.append("I couldn't search the guidelines this time, so only the ranking is shown.")
-    elif not has_sources:
-        lines.append("No guideline passage was close enough to this case, so no medical claim is made beyond the ranking.")
+    elif has_summary:
+        lines.append("Below is a short summary of each condition. You can download it as a PDF.")
+    elif has_tests:
+        lines.append("Only the recommended tests from the ICMR/MoHFW test protocol are shown. You can download them as a PDF.")
     else:
-        lines.append("I couldn't write the guideline summary this time; the retrieved sources are listed below.")
+        lines.append("I couldn't prepare a summary this time, so only the ranking is shown.")
     lines.append("This is decision support, not a diagnosis. Please discuss it with a doctor.")
     return "\n\n".join(lines)

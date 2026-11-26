@@ -13,7 +13,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from .conditions import CONTENT_TYPES, condition_name
+from .conditions import condition_name
 from .pipeline import ANSWER_LABEL
 from .session import Session
 
@@ -71,7 +71,7 @@ def build_pdf(s: Session) -> bytes:
         Spacer(1, 6),
         Paragraph(
             c("This summary ranks possible causes of acute undifferentiated fever from the patient's answers and "
-              "lists recommended confirmatory tests from clinical guidelines. It must be reviewed by a doctor."),
+              "lists the recommended confirmatory tests and a short summary of the likely conditions. It must be reviewed by a doctor."),
             body,
         ),
     ]
@@ -106,16 +106,21 @@ def build_pdf(s: Session) -> bytes:
     else:
         story.append(Paragraph("No guideline-backed test recommendation was available for this case.", body))
 
-    # per-disease detail
-    if s.explanation:
-        story.append(Paragraph("Summary by condition (from the guidelines)", h2))
-        for e in s.explanation:
+    # per-disease detail (the shortlisted conditions; the fixed summaries)
+    detail = [e for e in (s.explanation or []) if e.get("info") and e["diseaseId"] in s.shortlist]
+    if detail:
+        story.append(Paragraph("Summary by condition", h2))
+        for e in detail:
+            i = e["info"]
             story.append(Paragraph(c(e["disease"]), h3))
-            for sec in e["sections"]:
-                if sec["contentType"] == "confirmatory_tests":
-                    continue  # already shown above
-                story.append(Paragraph(f"<b>{c(CONTENT_TYPES[sec['contentType']])}.</b> " + cited(sec["text"], sec["citations"]), body))
-                story.append(Spacer(1, 3))
+            story.append(Paragraph(c(i["summary"]), body))
+            story.append(Spacer(1, 3))
+            story.append(Paragraph(f"<b>Caused by.</b> {c(i['causativeAgent'])}", body))
+            story.append(Paragraph(f"<b>How it spreads.</b> {c(i['transmission'])}", body))
+            story.append(Paragraph("<b>Prevention.</b>", body))
+            for m in i["preventiveMethods"]:
+                story.append(Paragraph("&bull; " + c(m), body))
+            story.append(Spacer(1, 3))
 
     # answers
     story.append(Paragraph("Patient's answers", h2))

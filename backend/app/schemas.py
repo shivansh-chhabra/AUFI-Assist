@@ -94,10 +94,19 @@ class ExplanationSection(Camel):
     citations: list[int]
 
 
+class DiseaseInfo(Camel):
+    """The fixed, hand-written summary of a condition (data/disease_summaries.json)."""
+    causative_agent: str
+    transmission: str
+    summary: str
+    preventive_methods: list[str]
+
+
 class DiseaseExplanation(Camel):
     disease_id: str
     disease: str
-    sections: list[ExplanationSection]
+    info: Optional[DiseaseInfo] = None
+    sections: list[ExplanationSection] = []
 
 
 class ChatResponse(Camel):

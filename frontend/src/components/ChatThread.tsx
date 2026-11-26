@@ -1,15 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import EvidencePanel from './EvidencePanel';
-import ExplanationPanel from './ExplanationPanel';
-import CandidatePanel from './CandidatePanel';
 import QuestionStage from './QuestionStage';
+import ResultView from './ResultView';
 import CaseProgress from './CaseProgress';
-import ReasoningPanel from './ReasoningPanel';
 import DocumentPreviewModal from './DocumentPreviewModal';
 import { EXAMPLE_PROMPTS } from '../conditions';
-import { BRAND_NAME } from '../brand';
 import { deriveCase } from '../utils/caseState';
 import type { AnswerOption, ChatMessage, FollowUpQuestion, Source } from '../types';
 
@@ -95,90 +89,24 @@ export default function ChatThread({
     );
   }
 
-  // ---- result: the first description, then the final answer (the Q&A is folded away) ----
+  // ---- result: summary, buttons for tests / other conditions / PDF, and questions about the condition ----
   const finalIdx = Math.max(0, messages.findIndex((m) => m.role === 'ai' && m.progress?.stopReason));
-  const firstUser = messages.find((m) => m.role === 'user');
-  const visible: ChatMessage[] = [...(firstUser ? [firstUser] : []), ...messages.slice(finalIdx)];
-  const answers: { q: string; a: string }[] = [];
-  messages.slice(0, finalIdx).forEach((m, i, arr) => {
-    const next = arr[i + 1];
-    if (m.role === 'ai' && m.question && next?.role === 'user') answers.push({ q: m.question.text, a: next.text });
+  const result = messages[finalIdx];
+  const qa: { question: string; answer?: ChatMessage }[] = [];
+  messages.slice(finalIdx + 1).forEach((m, i, arr) => {
+    if (m.role === 'user') qa.push({ question: m.text, answer: arr[i + 1]?.role === 'ai' ? arr[i + 1] : undefined });
   });
-  const lastAiWithCandidates = [...messages].reverse().find((m) => m.role === 'ai' && m.candidates?.length);
 
   return (
     <>
-      <CaseProgress progress={progress} />
-      <div className="thread">
-        <div ref={topRef} />
-        {visible.map((msg, idx) => (
-          <div className={`msg${msg.role === 'user' ? ' user' : ' ai'}`} key={msg.id}>
-            <div className="msg-inner">
-              <div className={`msg-role${msg.role === 'ai' ? ' ai' : ''}`}>{msg.role === 'user' ? 'You' : BRAND_NAME}</div>
-
-              {msg.role === 'ai' ? (
-                <div className="msg-body markdown-body">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
-                </div>
-              ) : (
-                <div className="msg-body">{msg.text}</div>
-              )}
-
-              {idx === 1 && answers.length > 0 && (
-                <details className="why-toggle" style={{ marginTop: '0.75rem' }}>
-                  <summary className="why-summary">
-                    <span className="chev">▶</span> Your answers ({answers.length})
-                  </summary>
-                  <ul className="answers-list">
-                    {answers.map((x, i) => (
-                      <li key={i}>
-                        <span>{x.q}</span>
-                        <b>{x.a}</b>
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
-
-              {msg.candidates && msg.candidates.length > 0 && (
-                <CandidatePanel candidates={msg.candidates} isLatest={msg === lastAiWithCandidates} />
-              )}
-
-              {msg.explanation && msg.explanation.length > 0 && (
-                <ExplanationPanel
-                  explanation={msg.explanation}
-                  sources={msg.evidence?.sources ?? []}
-                  onOpenSource={openSource}
-                  reportUrl={reportUrl}
-                />
-              )}
-
-              {msg.evidence && (
-                <EvidencePanel evidence={msg.evidence} explanation={msg.explanation} onOpenSource={openSource} />
-              )}
-
-              {msg.steps && msg.steps.length > 0 && (
-                <details className="why-toggle" style={{ marginTop: '0.75rem' }}>
-                  <summary className="why-summary">
-                    <span className="chev">▶</span> What the system did ({msg.steps.length} steps)
-                  </summary>
-                  <ReasoningPanel steps={msg.steps} />
-                </details>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {isLoading && (
-          <div className="msg ai">
-            <div className="msg-inner">
-              <div className="msg-role ai">{BRAND_NAME}</div>
-              <ReasoningPanel steps={liveSteps} live />
-            </div>
-          </div>
-        )}
-      </div>
-
+      <ResultView
+        result={result}
+        qa={qa}
+        isLoading={isLoading}
+        liveSteps={liveSteps}
+        reportUrl={reportUrl}
+        onOpenSource={openSource}
+      />
       {previewSource && (
         <DocumentPreviewModal
           filename={previewSource.file ?? previewSource.title}
